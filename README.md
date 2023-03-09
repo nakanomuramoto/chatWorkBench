@@ -5,7 +5,7 @@
 WARNING: pushしないこと <p>
 addしない方法
 ```
-git rm -r --ignore-unmatch key.txt
+git rm -r --ignore-unmatch --cached key.txt
 ```
 
 ToDo
