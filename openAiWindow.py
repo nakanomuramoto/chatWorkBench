@@ -41,7 +41,15 @@ def main():
         # chataiからの応答を取得する
         response = chatai.response(user_input)
         # print('>> AIChat: ' + response)
+
+        status = response['choices'][0]['finish_reason']
+        index_num = response['choices'][0]['index']
+        role = response['choices'][0]['message']['role']
+
+        total_tokens = str(response['usage']['total_tokens'])
+
         print(response)
+        print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens)
 
     print('>> AIChat: いつでもお話ししてくださいね。')
 
