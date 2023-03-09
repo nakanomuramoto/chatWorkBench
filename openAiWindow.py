@@ -7,9 +7,9 @@ class AIChat:
     def response(self, user_input):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            temperature=0.0,
+            temperature=0.5,
             messages=[
-                # {"role": "system", "content": "You are the best shell script programmer in the world."},
+                {"role": "system", "content": "You are the best python script programmer in the world."},    
                 {"role": "user", "content": user_input}]
         )
 
@@ -17,11 +17,18 @@ class AIChat:
         # return response['choices'][0]['message']['content']
 
         a = response['choices'][0]['message']['content']
-        b = a.replace("\n","")
+        # b = a.replace("\n","")
+        b = unicode_escape_sequence_to_japanese(a)
         # s_from_b = s_from_b_error.encode().decode('unicode-escape')
         print(b)
 
         return response
+
+import re
+
+def unicode_escape_sequence_to_japanese(text):
+    pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
+    return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
 
 def main():
 
@@ -48,7 +55,7 @@ def main():
 
         total_tokens = str(response['usage']['total_tokens'])
 
-        print(response)
+        # print(response)
         print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens)
 
     print('>> AIChat: いつでもお話ししてくださいね。')
