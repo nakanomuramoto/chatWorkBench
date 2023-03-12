@@ -14,7 +14,6 @@ def showText(sender, data):
     print(inputText)
 
 
-
 if __name__ == "__main__":
     dpg.create_context()
 
