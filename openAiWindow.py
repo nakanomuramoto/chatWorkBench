@@ -153,18 +153,18 @@ if __name__ == '__main__':
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="User Input", tag="window1", pos=(POSX1, POSY1)):
         # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-        dpg.add_input_text(tag="input1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, default_value="")
+        dpg.add_input_text(tag="input1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=showText)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
     with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2)):
         # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
-        dpg.add_input_text(tag="message1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, default_value="")
+        dpg.add_input_text(tag="message1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="Click me", callback=show_message)
 
     with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3)):
-        dpg.add_input_text(tag="code1", width=WIDTH3-30, height=HEIGHT3-100, multiline=True, default_value="")
+        dpg.add_input_text(tag="code1", width=WIDTH3-30, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
