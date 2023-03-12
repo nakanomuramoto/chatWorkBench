@@ -11,6 +11,7 @@ class AIChat:
             temperature=0.5,
             messages=[
                 {"role": "system", "content": "You are the best python script programmer in the world."},    
+                # {"role": "system", "content": "You are the best programmer in the world."},    
                 {"role": "user", "content": user_input}]
         )
 
