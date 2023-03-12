@@ -58,9 +58,20 @@ def showText(sender, data):
     a = response['choices'][0]['message']['content']
     responseMassage = unicode_escape_sequence_to_japanese(a)
 
+    if '```python' in a :
+        idStart = a.find('```python') + 10
+        idEnd = a.find('```', idStart+4) 
+        code1 = a[idStart:idEnd]
+
+        dpg.set_value("code1", code1)
+
+        responseMassage = a[:idStart-1] + a[idEnd:] 
+
     status = response['choices'][0]['finish_reason']
     index_num = response['choices'][0]['index']
     role = response['choices'][0]['message']['role']
+
+    dpg.set_value("message1", responseMassage)
 
     total_tokens = str(response['usage']['total_tokens'])
 
