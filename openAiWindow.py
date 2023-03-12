@@ -3,10 +3,14 @@ import openai
 
 import dearpygui.dearpygui as dpg
 
-POSX0, POSY0 = 10, 10
-POSX1, POSY1 = 720, POSY0
 WIDTH, HEIGHT = 1440, 720
-WIDTH1, HEIGHT1 = 700, 500
+WIDTH1, HEIGHT1 = 700, 300
+WIDTH2, HEIGHT2 = WIDTH1, 300
+WIDTH3, HEIGHT3 = 690, 640
+
+POSX1, POSY1 = 10, 10
+POSX2, POSY2 = 10, POSY1 + HEIGHT1 + 10
+POSX3, POSY3 = 10 + WIDTH1 + 10, 10
 
 class AIChat:
     def __init__(self, key):
@@ -47,7 +51,9 @@ def showText(sender, data):
     dpg.configure_item("message1", show=True)
     inputText=dpg.get_value("input1")
 
+    dpg.configure_item("nowLoading", show=True)
     response = chatai.response(inputText)
+    dpg.configure_item("nowLoading", show=False)
 
     a = response['choices'][0]['message']['content']
     responseMassage = unicode_escape_sequence_to_japanese(a)
@@ -63,6 +69,9 @@ def showText(sender, data):
 
     dpg.set_value("message1", responseMassage)
     print(inputText)
+
+def copyCodeAll():
+    pass
 
 def selectable_callback(sender, data):
     dpg.configure_item(sender, selectable=True)
@@ -87,7 +96,7 @@ def main():
         else:
             print('now loading... ')
 
-        
+
 
         # chataiからの応答を取得する
         response = chatai.response(user_input)
@@ -127,23 +136,25 @@ if __name__ == '__main__':
 
     dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="My Window", tag="test1", pos=(POSX0, POSY0)):
+    def on_text_changed(sender, data):
+        print(dpg.get_value(sender))
+
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User Input", tag="window1", pos=(POSX1, POSY1)):
+        # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
+        # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
+        dpg.add_input_text(tag="input1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, default_value="")
+        with dpg.group(horizontal=True):
+            dpg.add_button(label="Send", callback=showText)
+            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
+
+    with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2)):
         # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
         dpg.add_input_text(tag="message1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, default_value="")
         dpg.add_button(label="Click me", callback=show_message)
 
-    def on_text_changed(sender, data):
-        print(dpg.get_value(sender))
-
-    # with dpg.font_registry():
-    #     dpg.add_font("NotoSansCJKjp-Regular.otf", 20, "japanese") # default_font=True)
-
-
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="Text Input", tag="w1", pos=(POSX1, POSY1)):
-        # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
-        # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-        dpg.add_input_text(tag="input1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, default_value="")
-        dpg.add_button(label="Send", callback=showText)
+    with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3)):
+        dpg.add_input_text(tag="code1", width=WIDTH3-30, height=HEIGHT3-100, multiline=True, default_value="")
+        dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
