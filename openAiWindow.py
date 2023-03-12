@@ -1,3 +1,4 @@
+import sys
 import openai
 
 class AIChat:
@@ -39,11 +40,17 @@ def main():
 
     while True:
         # ユーザーからの入力を受け取る
-        user_input = input('>> User: ')
+        # user_input = input('>> User: ')
+
+        print('>> User: ')
+        user_input = sys.stdin.read()
 
         # ユーザーからの入力が「終了」だった場合にプログラムを終了する
-        if user_input == '終了' or user_input == 'exit' or user_input == 'おわり':
+        # if user_input == '終了' or user_input == 'exit' or user_input == 'おわり' or user_input == '' :
+        if user_input == '' :
             break
+        else:
+            print('now loading... ')
 
         # chataiからの応答を取得する
         response = chatai.response(user_input)
