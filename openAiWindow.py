@@ -4,13 +4,15 @@ import openai
 import dearpygui.dearpygui as dpg
 
 WIDTH, HEIGHT = 1440, 720
-WIDTH1, HEIGHT1 = 700, 300
-WIDTH2, HEIGHT2 = WIDTH1, 300
+WIDTH1, HEIGHT1 = 700, 260
+WIDTH2, HEIGHT2 = WIDTH1, 260
 WIDTH3, HEIGHT3 = 690, 640
+WIDTH4, HEIGHT4 = WIDTH1, 20
 
-POSX1, POSY1 = 10, 10
+POSX1, POSY1 = 10, 120
 POSX2, POSY2 = 10, POSY1 + HEIGHT1 + 10
 POSX3, POSY3 = 10 + WIDTH1 + 10, 10
+POSX4, POSY4 = 10, 10
 
 class AIChat:
     def __init__(self, key):
@@ -59,13 +61,13 @@ def showText(sender, data):
     responseMassage = unicode_escape_sequence_to_japanese(a)
 
     if '```python' in a :
-        idStart = a.find('```python') + 10
+        idStart = a.find('```') + 3
         idEnd = a.find('```', idStart+4) 
         code1 = a[idStart:idEnd]
 
         dpg.set_value("code1", code1)
 
-        responseMassage = a[:idStart-1] + a[idEnd:] 
+        responseMassage = a[:idStart] + "    " + a[idEnd:] 
 
     status = response['choices'][0]['finish_reason']
     index_num = response['choices'][0]['index']
@@ -150,21 +152,25 @@ if __name__ == '__main__':
     def on_text_changed(sender, data):
         print(dpg.get_value(sender))
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User Input", tag="window1", pos=(POSX1, POSY1)):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
         # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-        dpg.add_input_text(tag="input1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
+        dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=showText)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
-    with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2)):
+    with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2),horizontal_scrollbar=True):
         # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
-        dpg.add_input_text(tag="message1", width=WIDTH1-30, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
+        dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="Click me", callback=show_message)
 
-    with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3)):
-        dpg.add_input_text(tag="code1", width=WIDTH3-30, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
+    with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
+        dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
+        dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
+
+    with dpg.window(width=WIDTH4, label="Sequence", tag="qaSequence", pos=(POSX4, POSY4), no_title_bar=True, no_move=True):
+        # dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
