@@ -17,16 +17,20 @@ POSX4, POSY4 = 10, 10
 class AIChat:
     def __init__(self, key):
         openai.api_key = key
+        self.messageList = [{"role": "system", "content": "You are the best python script programmer in the world."}]
         self.totalTokens = 0
 
     def response(self, user_input):
+        self.messageList.append({"role": "user", "content": user_input})
+
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0.5,
-            messages=[
-                {"role": "system", "content": "You are the best python script programmer in the world."},    
-                # {"role": "system", "content": "You are the best programmer in the world."},    
-                {"role": "user", "content": user_input}]
+            # messages=[
+            #     {"role": "system", "content": "You are the best python script programmer in the world."},    
+            #     # {"role": "system", "content": "You are the best programmer in the world."},    
+            #     {"role": "user", "content": user_input}]
+            messages=self.messageList
         )
 
         # print(response['choices'][0]['message']['content'])
