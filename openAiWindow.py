@@ -17,6 +17,7 @@ POSX4, POSY4 = 10, 10
 class AIChat:
     def __init__(self, key):
         openai.api_key = key
+        self.totalTokens = 0
 
     def response(self, user_input):
         response = openai.ChatCompletion.create(
@@ -38,6 +39,13 @@ class AIChat:
         print(b)
 
         return response
+    
+    def showTotalTokens(self):
+        return self.totalTokens
+
+    def incrementTokens(self, addTokens):
+        self.totalTokens += addTokens
+        return self.totalTokens
 
 import re
 
@@ -75,7 +83,9 @@ def showText(sender, data):
 
     dpg.set_value("message1", responseMassage)
 
-    total_tokens = str(response['usage']['total_tokens'])
+    incTotalTokens = int(response['usage']['total_tokens'])
+    total_tokens = chatai.incrementTokens(incTotalTokens)
+    dpg.set_value("totalToken", "total Tokens = " + str(total_tokens))
 
     # print(response)
     print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens)
@@ -171,7 +181,9 @@ if __name__ == '__main__':
 
     with dpg.window(width=WIDTH4, label="Sequence", tag="qaSequence", pos=(POSX4, POSY4), no_title_bar=True, no_move=True):
         # dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
-        dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
+        with dpg.group(horizontal=True):
+            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.showTotalTokens()))
+            dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
