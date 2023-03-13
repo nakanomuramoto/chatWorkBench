@@ -19,49 +19,58 @@ POSX4, POSY4 = 10, 10
 SEQUENCENUMMAX = 9
 
 class AIChat:
+
+    # messages=[
+    #     {"role": "system", "content": "You are the best python script programmer in the world."},    
+    #     # {"role": "system", "content": "You are the best programmer in the world."},    
+    #     {"role": "user", "content": user_input}]
+
     def __init__(self, key):
         openai.api_key = key
-        self.messageList = [{"role": "system", "content": "You are the best python script programmer in the world."}]
+
+        self.systemContent = ["You are the best python script programmer in the world."]
+        self.userContents = []
+        self.assistantContents = []
+
+        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
         self.totalTokens = 0
         self.sequenceNum = 0
 
     def response(self, user_input):
         self.messageList.append({"role": "user", "content": user_input})
+        print(self.messageList)
+
+        self.userContents.append(user_input)
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             temperature=0.5,
-            # messages=[
-            #     {"role": "system", "content": "You are the best python script programmer in the world."},    
-            #     # {"role": "system", "content": "You are the best programmer in the world."},    
-            #     {"role": "user", "content": user_input}]
             messages=self.messageList
         )
 
-        # print(response['choices'][0]['message']['content'])
-        # return response['choices'][0]['message']['content']
+        a = response['choices'][0]['message']['content']
+        print("assistantAnswer:", unicode_escape_sequence_to_japanese(a))
 
-        a = response['choices'][self.sequenceNum]['message']['content']
-        b = unicode_escape_sequence_to_japanese(a)
-        print(b)
+        print(response)
 
         return response
     
     def showText(self, sender, data):
         dpg.configure_item("message1", show=True)
         inputText=dpg.get_value("input1")
+        print("userInput: ", inputText)
 
         dpg.configure_item("nowLoading", show=True)
         # response = chatai.response(inputText)
         response = self.response(inputText)
         dpg.configure_item("nowLoading", show=False)
 
-        a = response['choices'][self.sequenceNum]['message']['content']
+        a = response['choices'][0]['message']['content']
+        self.assistantContents.append(a)
         responseMassage = unicode_escape_sequence_to_japanese(a)
 
         if self.sequenceNum < SEQUENCENUMMAX : 
             self.messageList.append({"role": "assistant", "content": a})
-            self.sequenceNum += 1
 
             tabLabel = "#"+str(self.sequenceNum)
             dpg.configure_item(tabLabel, show=True)
@@ -82,16 +91,14 @@ class AIChat:
         dpg.set_value("message1", responseMassage)
 
         incTotalTokens = int(response['usage']['total_tokens'])
-        # total_tokens = chatai.incrementTokens(incTotalTokens)
         total_tokens = self.incrementTokens(incTotalTokens)
         dpg.set_value("totalToken", "total Tokens = " + str(total_tokens))
 
-
-        # print(response)
-        print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens)
+        print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
 
         dpg.set_value("message1", responseMassage)
-        print(inputText)
+
+        self.sequenceNum += 1
 
     def getTotalTokens(self):
         return self.totalTokens
