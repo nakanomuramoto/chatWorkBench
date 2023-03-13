@@ -4,12 +4,12 @@ import openai
 import dearpygui.dearpygui as dpg
 
 WIDTH, HEIGHT = 1440, 720
-WIDTH1, HEIGHT1 = 700, 260
-WIDTH2, HEIGHT2 = WIDTH1, 260
+WIDTH1, HEIGHT1 = 700, 640
+WIDTH2, HEIGHT2 = WIDTH1, 240
 WIDTH3, HEIGHT3 = 690, 640
 WIDTH4, HEIGHT4 = WIDTH1, 20
 
-POSX1, POSY1 = 10, 120
+POSX1, POSY1 = 10, 10
 POSX2, POSY2 = 10, POSY1 + HEIGHT1 + 10
 POSX3, POSY3 = 10 + WIDTH1 + 10, 10
 POSX4, POSY4 = 10, 10
@@ -166,28 +166,51 @@ if __name__ == '__main__':
     def on_text_changed(sender, data):
         print(dpg.get_value(sender))
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput and Assistant", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
         # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-        dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
+
+        # with dpg.group(horizontal=True):
+            # dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
+
+        # タブバーを作成
+        with dpg.tab_bar(label="My Tab Bar"):
+
+            for i in range(1, 8) :
+                tabLabel = "#"+str(i)
+                # タブ1を作成
+                with dpg.tab(label=tabLabel):
+                    # dpg.add_text("This is Tab 1")
+                    pass
+
+                # # タブ2を作成
+                # with dpg.tab(label="#2"):
+                #     # dpg.add_text("This is Tab 2")
+                #     pass
+
+        dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=showText)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
-    with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2),horizontal_scrollbar=True):
-        # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
-        dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
-        dpg.add_button(label="Click me", callback=show_message)
+        dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+
+        dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.showTotalTokens()))
+        
+    # with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2),horizontal_scrollbar=True):
+    #     # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
+    #     dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
+    #     dpg.add_button(label="Click me", callback=show_message)
 
     with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
         dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
-    with dpg.window(width=WIDTH4, label="Sequence", tag="qaSequence", pos=(POSX4, POSY4), no_title_bar=True, no_move=True):
-        # dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
-        with dpg.group(horizontal=True):
-            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.showTotalTokens()))
-            dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
+    # with dpg.window(width=WIDTH4, label="Sequence", tag="qaSequence", pos=(POSX4, POSY4), no_title_bar=True, no_move=True):
+    #     # dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
+    #     with dpg.group(horizontal=True):
+    #         dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.showTotalTokens()))
+    #         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
