@@ -104,7 +104,9 @@ class AIChat:
 
         self.sequenceNum += 1
         tabLabel = "#"+str(self.sequenceNum)
+        print(tabLabel)
         dpg.configure_item(tabLabel, show=True)
+        dpg.set_value("TabBars", tabLabel)
         
 
     def getTotalTokens(self):
@@ -133,7 +135,7 @@ def selectable_callback(sender, data):
     dpg.configure_item(sender, selectable=True)
 
 def main():
-    print('>> AIChat: いつでもお話ししてくださいね。')
+    print('>> AIChat: see you ')
 
 if __name__ == '__main__':
     # main()
@@ -171,7 +173,7 @@ if __name__ == '__main__':
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
         # タブバーを作成
-        with dpg.tab_bar(label="My Tab Bar"):
+        with dpg.tab_bar(label="TabBars", tag="TabBars"):
 
             for i in range(10) :
                 tabLabel = "#"+str(i)
