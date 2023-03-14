@@ -25,8 +25,8 @@ class AIChat:
 
     # messages=[
     #     {"role": "system", "content": "You are the best python script programmer in the world."},    
-    #     # {"role": "system", "content": "You are the best programmer in the world."},    
-    #     {"role": "user", "content": user_input}]
+    #     {"role": "user", "content": user_input},
+    #     {"role": "assistant", "content": a}]
 
     def __init__(self, key):
         openai.api_key = key
@@ -67,16 +67,13 @@ class AIChat:
         print("userInput: ", inputText)
 
         dpg.configure_item("nowLoading", show=True)
-        # response = chatai.response(inputText)
         response = self.response(inputText)
         dpg.configure_item("nowLoading", show=False)
 
         a = response['choices'][0]['message']['content']
         self.assistantContents.append(a)
 
-        # a.replace('\\u3002', '\\u3002\\n\\n')  
         responseMassage = unicode_escape_sequence_to_japanese(a)
-
 
         if self.sequenceNum < SEQUENCENUMMAX : 
             self.messageList.append({"role": "assistant", "content": a})
@@ -103,14 +100,8 @@ class AIChat:
 
         print(status, ", sequenceNum: ", self.sequenceNum, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
 
-        print("before:", responseMassage)
-
-        # # \u3002
-        # responseMassage.replace('\\u3002', '\\u3002\\n')  
         responseMassage = responseMassage.replace('。', '。\n')
         responseMassage = responseMassage.replace('.', '.\n')
-
-        print("after:", responseMassage)
 
         dpg.set_value(responseLabel, responseMassage)
 
@@ -122,7 +113,6 @@ class AIChat:
         self.sequenceNum += 1
         tabLabel = "#"+str(self.sequenceNum)    
         dpg.configure_item(tabLabel, show=True)
-        # dpg.set_value("TabBars", tabLabel)
 
     def getTotalTokens(self):
         return self.totalTokens
@@ -177,55 +167,28 @@ if __name__ == '__main__':
         print(dpg.get_value(sender))
 
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput and Assistant", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
-        # dpg.add_input_text(label="Enter Text", callback=on_text_changed)
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-
-        # with dpg.group(horizontal=True):
-            # dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=chatai.showText)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
-        # タブバーを作成
         with dpg.tab_bar(label="TabBars", tag="TabBars"):
-
             for i in range(10) :
                 tabLabel = "#"+str(i)
                 inputLabel = "input"+str(i)
                 responseLabel = "response"+str(i)
 
                 isShowTab = chatai.getSequenceNum() >= i
-                # タブ1を作成
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
-                    # dpg.add_text("This is Tab 1")
                     dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True)
                     dpg.add_input_text(tag=responseLabel, width=WIDTH-50, pos=(POSX6, POSY6), height=HEIGHT2, multiline=True, tracked=True, default_value="", enabled=False)
                 
-                # # タブ2を作成
-                # with dpg.tab(label="#2"):
-                #     # dpg.add_text("This is Tab 2")
-                #     pass
-
-        # dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
-        # dpg.add_input_text(tag="response0", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
-
         dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
         
-    # with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2),horizontal_scrollbar=True):
-    #     # dpg.add_text("Hello, World!", tag="response0", wrap=300, show=False, drag_callback=selectable_callback)
-    #     dpg.add_input_text(tag="response0", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
-    #     dpg.add_button(label="Click me", callback=show_message)
-
     with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
         dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
-
-    # with dpg.window(width=WIDTH4, label="Sequence", tag="qaSequence", pos=(POSX4, POSY4), no_title_bar=True, no_move=True):
-    #     # dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
-    #     with dpg.group(horizontal=True):
-    #         dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
-    #         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
