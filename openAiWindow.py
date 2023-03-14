@@ -9,12 +9,9 @@ WIDTH, HEIGHT = 1440, 720
 WIDTH1, HEIGHT1 = 700, 640
 WIDTH2, HEIGHT2 = WIDTH1, 240
 WIDTH3, HEIGHT3 = 690, 640
-WIDTH4, HEIGHT4 = WIDTH1, 20
 
 POSX1, POSY1 = 10, 10
-POSX2, POSY2 = 10, POSY1 + HEIGHT1 + 10
 POSX3, POSY3 = 10 + WIDTH1 + 10, 10
-POSX4, POSY4 = 10, 10
 
 POSX5, POSY5 = 50, 100
 POSX6, POSY6 = 10, 100 + HEIGHT2 + 10
@@ -24,7 +21,7 @@ SEQUENCENUMMAX = 9
 class AIChat:
 
     # messages=[
-    #     {"role": "system", "content": "You are the best python script programmer in the world."},    
+    #     {"role": "system", "content": systemComment},    
     #     {"role": "user", "content": user_input},
     #     {"role": "assistant", "content": a}]
 
@@ -84,7 +81,7 @@ class AIChat:
         if '```python' in a :
             idStart = a.find('```') + 3
             idEnd = a.find('```', idStart+4) 
-            code1 = a[idStart:idEnd]
+            code1 = "##" + a[idStart:idEnd]
 
             dpg.set_value("code1", code1)
 
@@ -128,16 +125,9 @@ def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
 
-def show_message():
-    dpg.configure_item("response0", show=True)
-    dpg.set_value("response0", "Button clicked!")
-
 def copyCodeAll(sender, app_data, user_data):
     getCode = dpg.get_value("code1")
     dpg.set_clipboard_text(getCode)
-
-def selectable_callback(sender, data):
-    dpg.configure_item(sender, selectable=True)
 
 def main():
     print('>> AIChat: see you ')
@@ -162,9 +152,6 @@ if __name__ == '__main__':
             dpg.add_font_range_hint(dpg.mvFontRangeHint_Japanese)
 
     dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
-
-    def on_text_changed(sender, data):
-        print(dpg.get_value(sender))
 
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput and Assistant", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
