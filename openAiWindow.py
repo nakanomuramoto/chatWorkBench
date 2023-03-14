@@ -73,7 +73,10 @@ class AIChat:
 
         a = response['choices'][0]['message']['content']
         self.assistantContents.append(a)
+
+        # a.replace('\\u3002', '\\u3002\\n\\n')  
         responseMassage = unicode_escape_sequence_to_japanese(a)
+
 
         if self.sequenceNum < SEQUENCENUMMAX : 
             self.messageList.append({"role": "assistant", "content": a})
@@ -99,6 +102,15 @@ class AIChat:
         dpg.set_value("totalToken", "total Tokens = " + str(total_tokens))
 
         print(status, ", sequenceNum: ", self.sequenceNum, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
+
+        print("before:", responseMassage)
+
+        # # \u3002
+        # responseMassage.replace('\\u3002', '\\u3002\\n')  
+        responseMassage = responseMassage.replace('。', '。\n')
+        responseMassage = responseMassage.replace('.', '.\n')
+
+        print("after:", responseMassage)
 
         dpg.set_value(responseLabel, responseMassage)
 
