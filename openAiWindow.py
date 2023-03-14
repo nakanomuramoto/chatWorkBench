@@ -16,6 +16,9 @@ POSX2, POSY2 = 10, POSY1 + HEIGHT1 + 10
 POSX3, POSY3 = 10 + WIDTH1 + 10, 10
 POSX4, POSY4 = 10, 10
 
+POSX5, POSY5 = 50, 100
+POSX6, POSY6 = 10, 100 + HEIGHT2 + 10
+
 SEQUENCENUMMAX = 9
 
 class AIChat:
@@ -56,8 +59,11 @@ class AIChat:
         return response
     
     def showText(self, sender, data):
-        dpg.configure_item("response0", show=True)
-        inputText=dpg.get_value("input0")
+        inputLabel = "input"+str(self.sequenceNum)
+        responseLabel = "response"+str(self.sequenceNum)
+
+        dpg.configure_item(responseLabel, show=True)
+        inputText=dpg.get_value(inputLabel)
         print("userInput: ", inputText)
 
         dpg.configure_item("nowLoading", show=True)
@@ -82,23 +88,24 @@ class AIChat:
 
             dpg.set_value("code1", code1)
 
-            responseMassage = a[:idStart] + "    " + a[idEnd:] 
+            responseMassage = a[:idStart] + "  右の窓に抜粋  " + a[idEnd:] 
 
         status = response['choices'][0]['finish_reason']
         index_num = response['choices'][0]['index']
         role = response['choices'][0]['message']['role']
 
-        dpg.set_value("response0", responseMassage)
-
         incTotalTokens = int(response['usage']['total_tokens'])
         total_tokens = self.incrementTokens(incTotalTokens)
         dpg.set_value("totalToken", "total Tokens = " + str(total_tokens))
 
-        print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
+        print(status, ", sequenceNum: ", self.sequenceNum, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
 
-        dpg.set_value("response0", responseMassage)
+        dpg.set_value(responseLabel, responseMassage)
 
         self.sequenceNum += 1
+        tabLabel = "#"+str(self.sequenceNum)
+        dpg.configure_item(tabLabel, show=True)
+        
 
     def getTotalTokens(self):
         return self.totalTokens
@@ -118,8 +125,9 @@ def show_message():
     dpg.configure_item("response0", show=True)
     dpg.set_value("response0", "Button clicked!")
 
-def copyCodeAll():
-    pass
+def copyCodeAll(sender, app_data, user_data):
+    getCode = dpg.get_value("code1")
+    dpg.set_clipboard_text(getCode)
 
 def selectable_callback(sender, data):
     dpg.configure_item(sender, selectable=True)
@@ -174,8 +182,8 @@ if __name__ == '__main__':
                 # タブ1を作成
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
                     # dpg.add_text("This is Tab 1")
-                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
-                    dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="")
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, pos=(POSX6, POSY6), height=HEIGHT2, multiline=True, tracked=True, default_value="")
                 
                 # # タブ2を作成
                 # with dpg.tab(label="#2"):
