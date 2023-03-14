@@ -56,8 +56,8 @@ class AIChat:
         return response
     
     def showText(self, sender, data):
-        dpg.configure_item("message1", show=True)
-        inputText=dpg.get_value("input1")
+        dpg.configure_item("response0", show=True)
+        inputText=dpg.get_value("input0")
         print("userInput: ", inputText)
 
         dpg.configure_item("nowLoading", show=True)
@@ -88,7 +88,7 @@ class AIChat:
         index_num = response['choices'][0]['index']
         role = response['choices'][0]['message']['role']
 
-        dpg.set_value("message1", responseMassage)
+        dpg.set_value("response0", responseMassage)
 
         incTotalTokens = int(response['usage']['total_tokens'])
         total_tokens = self.incrementTokens(incTotalTokens)
@@ -96,7 +96,7 @@ class AIChat:
 
         print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
 
-        dpg.set_value("message1", responseMassage)
+        dpg.set_value("response0", responseMassage)
 
         self.sequenceNum += 1
 
@@ -115,8 +115,8 @@ def unicode_escape_sequence_to_japanese(text):
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
 
 def show_message():
-    dpg.configure_item("message1", show=True)
-    dpg.set_value("message1", "Button clicked!")
+    dpg.configure_item("response0", show=True)
+    dpg.set_value("response0", "Button clicked!")
 
 def copyCodeAll():
     pass
@@ -125,38 +125,6 @@ def selectable_callback(sender, data):
     dpg.configure_item(sender, selectable=True)
 
 def main():
-    # with open('key.txt', 'r') as f:
-    #     key = f.read().strip()
-
-    # chatai = AIChat(key)
-
-    # while True:
-    #     # ユーザーからの入力を受け取る
-    #     # user_input = input('>> User: ')
-
-    #     print('>> User: ')
-    #     user_input = sys.stdin.read()
-
-    #     # ユーザーからの入力が「終了」だった場合にプログラムを終了する
-    #     # if user_input == '終了' or user_input == 'exit' or user_input == 'おわり' or user_input == '' :
-    #     if user_input == '' :
-    #         break
-    #     else:
-    #         print('now loading... ')
-
-    #     # chataiからの応答を取得する
-    #     response = chatai.response(user_input)
-    #     # print('>> AIChat: ' + response)
-
-    #     status = response['choices'][0]['finish_reason']
-    #     index_num = response['choices'][0]['index']
-    #     role = response['choices'][0]['message']['role']
-
-    #     total_tokens = str(response['usage']['total_tokens'])
-
-    #     # print(response)
-    #     print(status, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens)
-
     print('>> AIChat: いつでもお話ししてくださいね。')
 
 if __name__ == '__main__':
@@ -166,8 +134,6 @@ if __name__ == '__main__':
         key = f.read().strip()
 
     chatai = AIChat(key)
-
-    #引数で入力したファイル名の拡張子の前の最後の4桁の数字の一番上の桁を消すシェルスクリプトと実行例を教えて下さい
 
     dpg.create_context()
 
@@ -192,34 +158,38 @@ if __name__ == '__main__':
         # with dpg.group(horizontal=True):
             # dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
 
+        with dpg.group(horizontal=True):
+            dpg.add_button(label="Send", callback=chatai.showText)
+            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
+
         # タブバーを作成
         with dpg.tab_bar(label="My Tab Bar"):
 
             for i in range(10) :
                 tabLabel = "#"+str(i)
+                inputLabel = "input"+str(i)
+                responseLabel = "response"+str(i)
+
                 isShowTab = chatai.getSequenceNum() >= i
                 # タブ1を作成
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
                     # dpg.add_text("This is Tab 1")
-                    pass
-
+                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+                
                 # # タブ2を作成
                 # with dpg.tab(label="#2"):
                 #     # dpg.add_text("This is Tab 2")
                 #     pass
 
-        dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
-        with dpg.group(horizontal=True):
-            dpg.add_button(label="Send", callback=chatai.showText)
-            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
-
-        dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+        # dpg.add_input_text(tag="input1", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
+        # dpg.add_input_text(tag="response0", width=WIDTH, height=HEIGHT2, multiline=True, tracked=True, default_value="")
 
         dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
         
     # with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant", tag="window2", pos=(POSX2, POSY2),horizontal_scrollbar=True):
-    #     # dpg.add_text("Hello, World!", tag="message1", wrap=300, show=False, drag_callback=selectable_callback)
-    #     dpg.add_input_text(tag="message1", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
+    #     # dpg.add_text("Hello, World!", tag="response0", wrap=300, show=False, drag_callback=selectable_callback)
+    #     dpg.add_input_text(tag="response0", width=WIDTH, height=HEIGHT1-100, multiline=True, tracked=True, default_value="")
     #     dpg.add_button(label="Click me", callback=show_message)
 
     with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
