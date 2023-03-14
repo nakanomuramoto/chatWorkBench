@@ -114,12 +114,15 @@ class AIChat:
 
         dpg.set_value(responseLabel, responseMassage)
 
-        self.sequenceNum += 1
-        tabLabel = "#"+str(self.sequenceNum)
-        print(tabLabel)
-        dpg.configure_item(tabLabel, show=True)
+        dpg.configure_item(inputLabel, enabled=False)
+
+        tabLabel = "#"+str(self.sequenceNum)     
         dpg.set_value("TabBars", tabLabel)
-        
+
+        self.sequenceNum += 1
+        tabLabel = "#"+str(self.sequenceNum)    
+        dpg.configure_item(tabLabel, show=True)
+        # dpg.set_value("TabBars", tabLabel)
 
     def getTotalTokens(self):
         return self.totalTokens
@@ -196,8 +199,8 @@ if __name__ == '__main__':
                 # タブ1を作成
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
                     # dpg.add_text("This is Tab 1")
-                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="")
-                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, pos=(POSX6, POSY6), height=HEIGHT2, multiline=True, tracked=True, default_value="")
+                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True)
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, pos=(POSX6, POSY6), height=HEIGHT2, multiline=True, tracked=True, default_value="", enabled=False)
                 
                 # # タブ2を作成
                 # with dpg.tab(label="#2"):
