@@ -4,7 +4,7 @@
 返信にPythonのスクリプトが含まれる場合、そのスクリプトを抽出して表示する機能もあります。<p>
 
 ### 使い方
-% python openAiWindow.py  <p>
+% python chatWorkBench.py  <p>
  <p>
 
 ### Note: <p>
