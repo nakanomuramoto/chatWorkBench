@@ -28,7 +28,7 @@ class AIChat:
     def __init__(self, key):
         openai.api_key = key
 
-        self.systemContent = ["You are the best python script programmer in the world."]
+        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^."]
         self.userContents = []
         self.assistantContents = []
 
@@ -38,7 +38,7 @@ class AIChat:
 
     def resetChat(self):
         print("log reset")
-        self.systemContent = ["You are the best python script programmer in the world."]
+        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^."]
         self.userContents = []
         self.assistantContents = []
 
@@ -108,10 +108,11 @@ class AIChat:
             tabLabel = "#"+str(self.sequenceNum)
             dpg.configure_item(tabLabel, show=True)
 
-        if '```python' in a :
-            idStart = a.find('```') + 3
-            idEnd = a.find('```', idStart+4) 
-            code1 = "##" + a[idStart:idEnd]
+        # if '```python' in a :
+        if '^^^' in a :
+            idStart = a.find('^^^') + 3
+            idEnd = a.find('^^^', idStart+4) 
+            code1 = a[idStart:idEnd]
 
             dpg.set_value("code1", code1)
 
@@ -167,10 +168,6 @@ def main():
 
 if __name__ == '__main__':
     # main()
-
-    def chatReset(chatai):
-        chatai2 = AIChat(key)
-        chatai = chatai2
 
     with open('key.txt', 'r') as f:
         key = f.read().strip()
