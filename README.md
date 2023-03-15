@@ -17,11 +17,12 @@
 
 - API-keyはpushしないこと <p>
  <p>
- addしない方法<p>
  
- ```
- git rm -r --ignore-unmatch --cached key.txt
- ```
+addしない方法<p>
+
+   ```
+   git rm -r --ignore-unmatch --cached key.txt
+   ```
 
 - 作者はいかなる責任も負わない
 
