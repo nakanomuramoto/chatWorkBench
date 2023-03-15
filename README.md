@@ -14,12 +14,16 @@
  <p>
   
 ### 注意
-WARNING: API-keyはpushしないこと <p>
-<p>
-addしない方法<p>
-```
-git rm -r --ignore-unmatch --cached key.txt
-```
+
+- API-keyはpushしないこと <p>
+ <p>
+ addしない方法<p>
+ 
+ ```
+ git rm -r --ignore-unmatch --cached key.txt
+ ```
+
+- 作者はいかなる責任も負わない
 
 ### 参考
 https://aiacademy.jp/media/?p=3559
