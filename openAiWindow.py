@@ -108,7 +108,6 @@ class AIChat:
             tabLabel = "#"+str(self.sequenceNum)
             dpg.configure_item(tabLabel, show=True)
 
-        # if '```python' in a :
         if '~~~~~~' in a :
             idStart = a.find('~~~~~~') + 6
             idEnd = a.find('~~~~~~', idStart+4) 
