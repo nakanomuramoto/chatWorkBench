@@ -10,7 +10,7 @@ def show_message(sender, data, str0):
     dpg.set_value(text, buf)
 
 dpg.create_context()
-dpg.create_viewport(title='Quick Metric Calculator (alpha)', width=1750, height=825)
+dpg.create_viewport(title='test', width=1750, height=825)
 
 with dpg.window(width=400, height=300, label="My Window"):
     # add a button to trigger the message display
