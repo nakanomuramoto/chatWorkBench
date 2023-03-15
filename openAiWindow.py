@@ -10,8 +10,8 @@ WIDTH1, HEIGHT1 = 700, 640
 WIDTH2, HEIGHT2 = WIDTH1, 240
 WIDTH3, HEIGHT3 = 690, 640
 
-POSX1, POSY1 = 10, 10
-POSX3, POSY3 = 10 + WIDTH1 + 10, 10
+POSX1, POSY1 = 10, 30
+POSX3, POSY3 = 10 + WIDTH1 + 10, 30
 
 POSX5, POSY5 = 50, 100
 POSX6, POSY6 = 10, 100 + HEIGHT2 + 10
@@ -35,6 +35,36 @@ class AIChat:
         self.messageList = [{"role": "system", "content": self.systemContent[0]}]
         self.totalTokens = 0
         self.sequenceNum = 0
+
+    def resetChat(self):
+        print("log reset")
+        self.systemContent = ["You are the best python script programmer in the world."]
+        self.userContents = []
+        self.assistantContents = []
+
+        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
+        
+        inputLabel = "input0"
+        dpg.set_value(inputLabel, "")
+        dpg.configure_item(inputLabel, enabled=True)
+        responseLabel = "response0"
+        dpg.set_value(responseLabel, "")
+
+        self.sequenceNum = 0
+        for i in range(SEQUENCENUMMAX + 1) :
+            tabLabel = "#"+str(i)
+            inputLabel = "input"+str(i)
+            responseLabel = "response"+str(i)
+
+            dpg.configure_item(tabLabel, show=(1 > i))
+
+            dpg.set_value(inputLabel, "")
+            dpg.configure_item(inputLabel, enabled=True)
+            dpg.set_value(responseLabel, "")
+
+        self.totalTokens = 0
+        dpg.set_value("totalToken", "total Tokens = " + str(self.totalTokens))
+
 
     def response(self, user_input):
         self.messageList.append({"role": "user", "content": user_input})
@@ -98,7 +128,7 @@ class AIChat:
         print(status, ", sequenceNum: ", self.sequenceNum, ", id: ", index_num, ", role: ", role, ", total tokens: ", total_tokens, "\n")
 
         responseMassage = responseMassage.replace('。', '。\n')
-        responseMassage = responseMassage.replace('.', '.\n')
+        responseMassage = responseMassage.replace('. ', '.\n')
 
         dpg.set_value(responseLabel, responseMassage)
 
@@ -129,11 +159,18 @@ def copyCodeAll(sender, app_data, user_data):
     getCode = dpg.get_value("code1")
     dpg.set_clipboard_text(getCode)
 
+def exit(_sender, _data):
+    dpg.stop_dearpygui()
+
 def main():
     print('>> AIChat: see you ')
 
 if __name__ == '__main__':
     # main()
+
+    def chatReset(chatai):
+        chatai2 = AIChat(key)
+        chatai = chatai2
 
     with open('key.txt', 'r') as f:
         key = f.read().strip()
@@ -141,6 +178,22 @@ if __name__ == '__main__':
     chatai = AIChat(key)
 
     dpg.create_context()
+
+    with dpg.viewport_menu_bar():
+        with dpg.menu(label="File"):
+            # dpg.add_menu_item(label="Open", callback=openImage)
+            # dpg.add_menu_item(label="SetPath", callback=setPath)
+            # dpg.add_menu_item(label="Save", callback=print_me)
+            # dpg.add_menu_item(label="Save As", callback=print_me)
+
+            with dpg.menu(label="Settings"):
+                # dpg.add_menu_item(label="Setting 1", callback=print_me, check=True)
+                # dpg.add_menu_item(label="Setting 2", callback=print_me)
+                pass
+
+            dpg.add_menu_item(label="Reset", callback=chatai.resetChat)
+
+            dpg.add_menu_item(label="Quit", callback=exit, user_data = chatai)
 
     # https://github.com/morikatron/snippet/blob/master/dear_pygui_examples/font_example.py
     # font https://fonts.google.com/noto/specimen/Noto+Sans+JP
@@ -161,7 +214,7 @@ if __name__ == '__main__':
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
 
         with dpg.tab_bar(label="TabBars", tag="TabBars"):
-            for i in range(10) :
+            for i in range(SEQUENCENUMMAX + 1) :
                 tabLabel = "#"+str(i)
                 inputLabel = "input"+str(i)
                 responseLabel = "response"+str(i)
