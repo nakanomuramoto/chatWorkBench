@@ -211,7 +211,8 @@ if __name__ == '__main__':
 
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=chatai.showText)
-            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False)
+            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
+            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False) 
 
         with dpg.tab_bar(label="TabBars", tag="TabBars"):
             for i in range(SEQUENCENUMMAX + 1) :
@@ -222,13 +223,12 @@ if __name__ == '__main__':
                 isShowTab = chatai.getSequenceNum() >= i
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
                     dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True)
-                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, pos=(POSX6, POSY6), height=HEIGHT2, multiline=True, tracked=True, default_value="", enabled=False)
-                
-        dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
-        
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, height=-10, pos=(POSX6, POSY6), multiline=True, tracked=True, default_value="", enabled=False)
+                       
     with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
-        dpg.add_input_text(tag="code1", width=WIDTH, height=HEIGHT3-100, multiline=True, tracked=True, default_value="")
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
+        dpg.add_input_text(tag="code1", width=WIDTH, height=-10, multiline=True, tracked=True, default_value="")
+       
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
