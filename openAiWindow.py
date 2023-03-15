@@ -28,7 +28,7 @@ class AIChat:
     def __init__(self, key):
         openai.api_key = key
 
-        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^."]
+        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^.  Show me the explanation afterwards."]
         self.userContents = []
         self.assistantContents = []
 
@@ -38,7 +38,7 @@ class AIChat:
 
     def resetChat(self):
         print("log reset")
-        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^."]
+        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ^^^.  Show me the explanation afterwards."]
         self.userContents = []
         self.assistantContents = []
 
