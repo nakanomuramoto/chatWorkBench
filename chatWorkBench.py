@@ -185,7 +185,9 @@ if __name__ == '__main__':
             with dpg.menu(label="Settings"):
                 # dpg.add_menu_item(label="Setting 1", callback=print_me, check=True)
                 # dpg.add_menu_item(label="Setting 2", callback=print_me)
-                pass
+                
+                dpg.add_combo(("Python", "shellScript", "N/A"), label="Combo", default_value="Python")
+                dpg.add_slider_float(label="temperature")
 
             dpg.add_menu_item(label="Reset", callback=chatai.resetChat)
 
