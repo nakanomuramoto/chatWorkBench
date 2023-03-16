@@ -8,7 +8,6 @@ import dearpygui.dearpygui as dpg
 WIDTH, HEIGHT = 1440, 720
 WIDTH1, HEIGHT1 = 700, 640
 WIDTH2, HEIGHT2 = WIDTH1, 240
-WIDTH3, HEIGHT3 = 690, 640
 
 POSX1, POSY1 = 10, 30
 POSX3, POSY3 = 10 + WIDTH1 + 10, 30
@@ -73,7 +72,7 @@ class AIChat:
         self.userContents.append(user_input)
 
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo", # "gpt-4",
             temperature=0.5,
             messages=self.messageList
         )
@@ -159,6 +158,12 @@ def copyCodeAll(sender, app_data, user_data):
     getCode = dpg.get_value("code1")
     dpg.set_clipboard_text(getCode)
 
+def activateTranslation(sender, app_data):
+    if(dpg.get_value("isTranslation")) :
+        dpg.configure_item("window1", width=WIDTH1-200)
+    else:
+        dpg.configure_item("window1", width=WIDTH1)
+
 def exit(_sender, _data):
     dpg.stop_dearpygui()
 
@@ -210,7 +215,10 @@ if __name__ == '__main__':
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=chatai.showText)
             dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
+
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False) 
+
+            dpg.add_checkbox(tag="isTranslation", label="Translation", indent=300, callback=activateTranslation)
 
         with dpg.tab_bar(label="TabBars", tag="TabBars"):
             for i in range(SEQUENCENUMMAX + 1) :
@@ -220,10 +228,10 @@ if __name__ == '__main__':
 
                 isShowTab = chatai.getSequenceNum() >= i
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
-                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True)
-                    dpg.add_input_text(tag=responseLabel, width=WIDTH-50, height=-10, pos=(POSX6, POSY6), multiline=True, tracked=True, default_value="", enabled=False)
+                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True, tab_input=True)
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH, height=-10, pos=(POSX6, POSY6), multiline=True, tracked=True, default_value="", enabled=False)
                        
-    with dpg.window(width=WIDTH3, height=HEIGHT3, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH, height=HEIGHT, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
         dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
         dpg.add_input_text(tag="code1", width=WIDTH, height=-10, multiline=True, tracked=True, default_value="")
        
