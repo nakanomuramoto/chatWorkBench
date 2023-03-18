@@ -170,6 +170,25 @@ class AIChat:
     def getSequenceNum(self):
         return self.sequenceNum
 
+    def activateTranslation(self, sender, app_data):
+        inputLabel = "input"+str(self.sequenceNum)
+        inputText=dpg.get_value(inputLabel)
+
+        if(inputText == ""):
+            return
+        else:  
+            tabEnLabel = "#"+str(self.sequenceNum)+"_EN"
+            dpg.configure_item(tabEnLabel, show=True)
+
+            inputCodeLabel = "inputCode"+str(self.sequenceNum) 
+            inputEnCodeLabel = "inputCode"+str(self.sequenceNum)+"_EN" 
+            dpg.set_value(inputEnCodeLabel, dpg.get_value(inputCodeLabel))    
+
+        # if(dpg.get_value("isTranslation")) :
+        #     dpg.configure_item("window1", width=WIDTH1-200)
+        # else:
+        #     dpg.configure_item("window1", width=WIDTH1)
+
 def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
@@ -178,12 +197,6 @@ def copyCodeAll(sender, app_data, user_data):
     responseCodeLabel = "responseCode"+str(user_data)
     getCode = dpg.get_value(responseCodeLabel)
     dpg.set_clipboard_text(getCode)
-
-def activateTranslation(sender, app_data):
-    if(dpg.get_value("isTranslation")) :
-        dpg.configure_item("window1", width=WIDTH1-200)
-    else:
-        dpg.configure_item("window1", width=WIDTH1)
 
 def exit(_sender, _data):
     dpg.stop_dearpygui()
@@ -230,28 +243,6 @@ if __name__ == '__main__':
 
     dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), horizontal_scrollbar=True):
-        # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
-
-        with dpg.group(horizontal=True):
-            dpg.add_button(label="Ask openAI", callback=chatai.SendMessageToOpenAI)
-            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False, color=(10,220,10)) 
-            dpg.add_checkbox(tag="isTranslation", label="Translation", indent=150, callback=activateTranslation)
-            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)            
-
-        with dpg.tab_bar(label="TabBars", tag="TabBars") :
-            for i in range(SEQUENCENUMMAX + 1) :
-                tabLabel = "#"+str(i)
-
-                inputLabel = "input"+str(i)
-                inputCodeLabel = "inputCode"+str(i)
-
-                isShowTab = chatai.getSequenceNum() >= i
-                with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
-                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, tracked=True, enabled=True, tab_input=True)
-                    dpg.add_text("Code Suggestion", pos=(POSX5, POSY6-30) )
-                    dpg.add_input_text(tag=inputCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True, enabled=False)
-                       
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
         dpg.add_text(default_value="response from chatGPT " )
 
@@ -270,6 +261,36 @@ if __name__ == '__main__':
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = j)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
 
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), horizontal_scrollbar=True):
+        # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
+
+        with dpg.group(horizontal=True):
+            dpg.add_button(label="Ask openAI", callback=chatai.SendMessageToOpenAI)
+            dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False, color=(10,220,10)) 
+            dpg.add_button(tag="jptoEnTranslation", label="Translation to EN", indent=150, callback=chatai.activateTranslation)
+            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)            
+      
+        with dpg.tab_bar(label="TabBars", tag="TabBars") :
+            for i in range(SEQUENCENUMMAX + 1) :
+                tabLabel = "#"+str(i)
+                tabEnLabel = "#"+str(i)+"_EN"
+
+                inputLabel = "input"+str(i)
+                inputEnLabel = "input"+str(i)+"_EN"
+                inputCodeLabel = "inputCode"+str(i) 
+                inputEnCodeLabel = "inputCode"+str(i)+"_EN"                       
+
+                isShowTab = chatai.getSequenceNum() >= i
+                with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
+                    dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, tracked=True, enabled=True, tab_input=True)
+                    dpg.add_text("Code Suggestion" , pos=(POSX5, POSY6-32)) # 
+                    dpg.add_input_text(tag=inputCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True, enabled=True)
+
+                with dpg.tab(label=tabEnLabel, tag=tabEnLabel, show=False):
+                    dpg.add_input_text(tag=inputEnLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, tracked=True, enabled=True, tab_input=True)
+                    dpg.add_text("Code Suggestion" , pos=(POSX5, POSY6-32)) # 
+                    dpg.add_input_text(tag=inputEnCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True, enabled=True)
+        
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()
