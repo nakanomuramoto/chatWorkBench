@@ -12,8 +12,8 @@ WIDTH2, HEIGHT2 = WIDTH1, 240
 POSX1, POSY1 = 10, 30
 POSX3, POSY3 = 10 + WIDTH1 + 10, 30
 
-POSX5, POSY5 = 50, 100
-POSX6, POSY6 = 10, 100 + HEIGHT2 + 10
+POSX5, POSY5 = 10, 100
+POSX6, POSY6 = 10, 100 + HEIGHT2 + 30
 
 SEQUENCENUMMAX = 9
 
@@ -209,32 +209,44 @@ if __name__ == '__main__':
 
     dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="UserInput and Assistant", tag="window1", pos=(POSX1, POSY1),horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), horizontal_scrollbar=True):
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
 
         with dpg.group(horizontal=True):
             dpg.add_button(label="Send", callback=chatai.showText)
             dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()))
-
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False) 
-
             dpg.add_checkbox(tag="isTranslation", label="Translation", indent=300, callback=activateTranslation)
 
-        with dpg.tab_bar(label="TabBars", tag="TabBars"):
+        with dpg.tab_bar(label="TabBars", tag="TabBars") :
             for i in range(SEQUENCENUMMAX + 1) :
                 tabLabel = "#"+str(i)
                 inputLabel = "input"+str(i)
-                responseLabel = "response"+str(i)
+                inputCodeLabel = "inputCode"+str(i)
 
                 isShowTab = chatai.getSequenceNum() >= i
                 with dpg.tab(label=tabLabel, tag=tabLabel, show=isShowTab):
                     dpg.add_input_text(tag=inputLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), multiline=True, tracked=True, default_value="", enabled=True, tab_input=True)
-                    dpg.add_input_text(tag=responseLabel, width=WIDTH, height=-10, pos=(POSX6, POSY6), multiline=True, tracked=True, default_value="", enabled=False)
+                    dpg.add_text("Code Suggestion", pos=(POSX5, POSY6-30) )
+                    dpg.add_input_text(tag=inputCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), multiline=True, tracked=True, default_value="", enabled=False)
                        
-    with dpg.window(width=WIDTH, height=HEIGHT, label="AssistantCode", tag="window3", pos=(POSX3, POSY3),horizontal_scrollbar=True):
-        dpg.add_button(label="CopyCodeAll", callback=copyCodeAll)
-        dpg.add_input_text(tag="code1", width=WIDTH, height=-10, multiline=True, tracked=True, default_value="")
-       
+    with dpg.window(width=WIDTH1, height=HEIGHT, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
+        dpg.add_text(default_value="response from chatGPT " )
+
+        with dpg.tab_bar(label="assistantTabBars", tag="assistantTabBars") :
+            for j in range(SEQUENCENUMMAX + 1) :
+                tabLabela = "#_"+str(j)
+                # inputLabel = "input"+str(i)
+                responseLabel = "response"+str(j)
+                responseCodeLabel = "responseCode"+str(j)
+                responseCode = "responseCode"+str(j)
+                copyCodeAllLabel = "copyCodeAllLabel"+str(j)
+
+                isShowTaba = chatai.getSequenceNum() >= j
+                with dpg.tab(label=tabLabela, tag=tabLabela, show=isShowTaba):
+                    dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, default_value="" , multiline=True, enabled=False , tracked=True, pos=(POSX6, POSY6))
+                    dpg.add_button(label="copyCodeAllLabel", pos=(POSX5, POSY6-30) , callback=copyCodeAll)
+                    dpg.add_input_text(tag=responseCode, multiline=True, tracked=True, width=WIDTH, height=HEIGHT2, default_value="") 
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
