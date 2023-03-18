@@ -144,21 +144,27 @@ class AIChat:
             responseMassage = responseMassage.replace('。', '。\n')
             responseMassage = responseMassage.replace('. ', '.\n')
 
+            tabAnsLabel = "#_"+str(self.sequenceNum) 
+            dpg.set_value("TabAnsBars", tabAnsLabel)
+            tabAnsLabel = "#_"+str(self.sequenceNum)                 
+            dpg.configure_item(tabAnsLabel, show=True)      
+
             dpg.set_value(responseLabel, responseMassage)
 
             dpg.configure_item(inputLabel, enabled=False)
             dpg.configure_item(responseLabel, enabled=False)
 
             tabLabel = "#"+str(self.sequenceNum)    
-            tabLabela = "#_"+str(self.sequenceNum) 
             dpg.set_value("TabBars", tabLabel)
-            dpg.set_value("TabBarsa", tabLabela)
+            
+            # tabAnsLabel = "#_"+str(self.sequenceNum) 
+            # dpg.set_value("TabAnsBars", tabAnsLabel)
+            # tabAnsLabel = "#_"+str(self.sequenceNum)                 
+            # dpg.configure_item(tabAnsLabel, show=True)            
 
             self.sequenceNum += 1
             tabLabel = "#"+str(self.sequenceNum)
-            tabLabela = "#_"+str(self.sequenceNum)     
             dpg.configure_item(tabLabel, show=True)
-            dpg.configure_item(tabLabela, show=True)
 
     def getTotalTokens(self):
         return self.totalTokens
@@ -246,17 +252,17 @@ if __name__ == '__main__':
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
         dpg.add_text(default_value="response from chatGPT " )
 
-        with dpg.tab_bar(label="assistantTabBars", tag="TabBarsa") :
+        with dpg.tab_bar(label="assistantTabBars", tag="TabAnsBars") :
             for j in range(SEQUENCENUMMAX + 1) :
-                tabLabela = "#_"+str(j)
+                tabAnsLabel = "#_"+str(j)
 
                 responseLabel = "response"+str(j)
                 responseCodeLabel = "responseCode"+str(j)
 
                 copyCodeAllLabel = "copyCodeAllLabel"+str(j)
 
-                isShowTaba = chatai.getSequenceNum() >= j
-                with dpg.tab(label=tabLabela, tag=tabLabela, show=isShowTaba):
+                isShowTaba = chatai.getSequenceNum() > j
+                with dpg.tab(label=tabAnsLabel, tag=tabAnsLabel, show=isShowTaba):
                     dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = j)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
