@@ -50,20 +50,30 @@ class AIChat:
         inputLabel = "input0"
         dpg.set_value(inputLabel, "")
         dpg.configure_item(inputLabel, enabled=True)
+
         responseLabel = "response0"
         dpg.set_value(responseLabel, "")
+        dpg.configure_item(responseLabel, enabled=False)
 
         self.sequenceNum = 0
         for i in range(SEQUENCENUMMAX + 1) :
             tabLabel = "#"+str(i)
             inputLabel = "input"+str(i)
+            inputCodeLabel = "inputCode"+str(i)             
             responseLabel = "response"+str(i)
 
+            tabAnsLabel = "#_"+str(i)
+            responseCodeLabel = "responseCode"+str(i)
+
             dpg.configure_item(tabLabel, show=(1 > i))
+            dpg.configure_item(tabAnsLabel, show=(0 > i))
 
             dpg.set_value(inputLabel, "")
             dpg.configure_item(inputLabel, enabled=True)
+
+            dpg.set_value(inputCodeLabel, "")
             dpg.set_value(responseLabel, "")
+            dpg.set_value(responseCodeLabel, "")
 
         self.totalTokens = 0
         dpg.set_value("totalToken", "total Tokens = " + str(self.totalTokens))
