@@ -29,8 +29,8 @@ class AIChat:
 
         self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
         self.userContents = []
+        self.userCode = []        
         self.assistantContents = []
-        self.userCode = []
         self.assistantCode = []
 
         self.messageList = [{"role": "system", "content": self.systemContent[0]}]
@@ -40,9 +40,9 @@ class AIChat:
     def resetChat(self):
         print("log reset")
         self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
-        self.userCode = []
+        self.userContents = []
+        self.userCode = []        
         self.assistantContents = []
-        self.userCode = []
         self.assistantCode = []
 
         self.messageList = [{"role": "system", "content": self.systemContent[0]}]
@@ -82,7 +82,7 @@ class AIChat:
         )
 
         a = response['choices'][0]['message']['content']
-        print("assistantAnswer:", unicode_escape_sequence_to_japanese(a))
+        # print("assistantAnswer:", unicode_escape_sequence_to_japanese(a))
 
         print(response)
 
@@ -97,6 +97,7 @@ class AIChat:
         else:    
             inputLabel = "input"+str(self.sequenceNum)
             responseLabel = "response"+str(self.sequenceNum)
+            responseCodeLabel = "responseCode"+str(self.sequenceNum)
 
             dpg.configure_item(responseLabel, show=True)
             inputText=dpg.get_value(inputLabel)
@@ -122,9 +123,13 @@ class AIChat:
                 idEnd = a.find('~~~~~~', idStart+4) 
                 code1 = a[idStart:idEnd]
 
-                dpg.set_value("code1", code1)
+                print("code ", code1)
+                dpg.set_value(responseCodeLabel, code1)
+                self.assistantCode.append(code1)
 
-                responseMassage = a[:idStart] + "  右の窓に抜粋  " + a[idEnd:] 
+                responseMassage = a[:idStart] + "  下の窓に抜粋  " + a[idEnd:] 
+            else:
+                self.assistantCode.append("")
 
             status = response['choices'][0]['finish_reason']
             index_num = response['choices'][0]['index']
@@ -142,6 +147,7 @@ class AIChat:
             dpg.set_value(responseLabel, responseMassage)
 
             dpg.configure_item(inputLabel, enabled=False)
+            dpg.configure_item(responseLabel, enabled=False)
 
             tabLabel = "#"+str(self.sequenceNum)    
             tabLabela = "#_"+str(self.sequenceNum) 
@@ -169,7 +175,8 @@ def unicode_escape_sequence_to_japanese(text):
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
 
 def copyCodeAll(sender, app_data, user_data):
-    getCode = dpg.get_value("code1")
+    responseCodeLabel = "responseCode"+str(user_data)
+    getCode = dpg.get_value(responseCodeLabel)
     dpg.set_clipboard_text(getCode)
 
 def activateTranslation(sender, app_data):
@@ -229,7 +236,7 @@ if __name__ == '__main__':
         with dpg.group(horizontal=True):
             dpg.add_button(label="Ask openAI", callback=chatai.SendMessageToOpenAI)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False, color=(10,220,10)) 
-            dpg.add_checkbox(tag="isTranslation", label="Translation", indent=100, callback=activateTranslation)
+            dpg.add_checkbox(tag="isTranslation", label="Translation", indent=150, callback=activateTranslation)
             dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)            
 
         with dpg.tab_bar(label="TabBars", tag="TabBars") :
@@ -245,7 +252,7 @@ if __name__ == '__main__':
                     dpg.add_text("Code Suggestion", pos=(POSX5, POSY6-30) )
                     dpg.add_input_text(tag=inputCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True, enabled=False)
                        
-    with dpg.window(width=WIDTH1, height=HEIGHT, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
         dpg.add_text(default_value="response from chatGPT " )
 
         with dpg.tab_bar(label="assistantTabBars", tag="TabBarsa") :
@@ -260,7 +267,7 @@ if __name__ == '__main__':
                 isShowTaba = chatai.getSequenceNum() >= j
                 with dpg.tab(label=tabLabela, tag=tabLabela, show=isShowTaba):
                     dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
-                    dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll)
+                    dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = j)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
 
     dpg.setup_dearpygui()
