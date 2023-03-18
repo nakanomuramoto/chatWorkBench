@@ -106,11 +106,15 @@ class AIChat:
             return
         else:    
             inputLabel = "input"+str(self.sequenceNum)
+            inputCodeLabel = "inputCode"+str(self.sequenceNum) 
+
             responseLabel = "response"+str(self.sequenceNum)
             responseCodeLabel = "responseCode"+str(self.sequenceNum)
 
             dpg.configure_item(responseLabel, show=True)
             inputText=dpg.get_value(inputLabel)
+            inputCode=dpg.get_value(inputCodeLabel)
+            inputText += inputCode
             print("userInput: ", inputText)
 
             dpg.configure_item("nowLoading", show=True)
