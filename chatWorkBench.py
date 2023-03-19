@@ -97,32 +97,33 @@ class AIChat:
         self.sequenceResponseNum = 0
         for i in range(SEQUENCENUMMAX + 1) :
             tabLabel = "#"+str(i)
-            tabEnLabel = "#"+str(i)+"_EN"
-            inputLabel = "input"+str(i)
-            inputEnLabel = "input"+str(i)+"_EN"
-            inputCodeLabel = "inputCode"+str(i)             
-
-            tabAnsLabel = "#_"+str(i)
-            tabJpAnsLabel = "#_"+str(i)+"_JP"
-            responseLabel = "response"+str(i)
-            responseJpLabel = "response"+str(i)+"_JP" 
-            responseCodeLabel = "responseCode"+str(i)
-            responseJpCodeLabel = "responseCode"+str(i)+"_JP"
-
             dpg.configure_item(tabLabel, show=(1 > i))
-            dpg.configure_item(tabEnLabel, show=(0 > i))
-            dpg.configure_item(tabAnsLabel, show=(0 > i))
-            dpg.configure_item(tabJpAnsLabel, show=(0 > i))
-
+            inputLabel = "input"+str(i)
             dpg.set_value(inputLabel, "")
-            dpg.configure_item(inputLabel, enabled=True)
+            dpg.configure_item(inputLabel, enabled=True)            
+
+            tabEnLabel = "#"+str(i)+"_EN"
+            dpg.configure_item(tabEnLabel, show=(0 > i))
+            inputEnLabel = "input"+str(i)+"_EN"
             dpg.set_value(inputEnLabel, "")
             dpg.configure_item(inputEnLabel, enabled=True)
 
-            dpg.set_value(inputCodeLabel, "")
-            dpg.set_value(responseLabel, "")
+            inputCodeLabel = "inputCode"+str(i)   
+            dpg.set_value(inputCodeLabel, "")                      
+
+            tabResponseLabel = "#_"+str(i)
+            dpg.configure_item(tabResponseLabel, show=(0 > i))
+            responseLabel = "response"+str(i)
+            dpg.set_value(responseLabel, "")            
+
+            tabJpResponseLabel = "#_"+str(i)+"_JP"
+            dpg.configure_item(tabJpResponseLabel, show=(0 > i))
+            responseJpLabel = "response"+str(i)+"_JP" 
             dpg.set_value(responseJpLabel, "")
+
+            responseCodeLabel = "responseCode"+str(i)
             dpg.set_value(responseCodeLabel, "")
+            responseJpCodeLabel = "responseCode"+str(i)+"_JP"
             dpg.set_value(responseJpCodeLabel, "")
 
         self.totalTokens = 0
@@ -213,10 +214,10 @@ class AIChat:
             responseMassage = responseMassage.replace('。', '。\n')
             responseMassage = responseMassage.replace('. ', '.\n')
 
-            tabAnsLabel = "#_"+str(self.sequenceResponseNum) 
-            dpg.set_value("TabAnsBars", tabAnsLabel)
-            tabAnsLabel = "#_"+str(self.sequenceResponseNum)                 
-            dpg.configure_item(tabAnsLabel, show=True)      
+            tabResponseLabel = "#_"+str(self.sequenceResponseNum) 
+            dpg.set_value("TabAnsBars", tabResponseLabel)
+            tabResponseLabel = "#_"+str(self.sequenceResponseNum)                 
+            dpg.configure_item(tabResponseLabel, show=True)      
 
             dpg.set_value(responseLabel, responseMassage)
             dpg.configure_item(responseLabel, enabled=False)
@@ -228,10 +229,10 @@ class AIChat:
             tabLabel = "#"+str(self.sequenceInputNum)    
             dpg.set_value("TabBars", tabLabel)
             
-            # tabAnsLabel = "#_"+str(self.sequenceInputNum) 
-            # dpg.set_value("TabAnsBars", tabAnsLabel)
-            # tabAnsLabel = "#_"+str(self.sequenceInputNum)                 
-            # dpg.configure_item(tabAnsLabel, show=True)            
+            # tabResponseLabel = "#_"+str(self.sequenceInputNum) 
+            # dpg.set_value("TabAnsBars", tabResponseLabel)
+            # tabResponseLabel = "#_"+str(self.sequenceInputNum)                 
+            # dpg.configure_item(tabResponseLabel, show=True)            
 
             self.sequenceInputNum += 1
             tabLabel = "#"+str(self.sequenceInputNum)
@@ -285,8 +286,8 @@ class AIChat:
             dpg.configure_item("nowTranlatingJP", show=False)  
             print("deepL output Jp ", responseJpText)
 
-            tabJpAnsLabel = "#_"+str(self.sequenceResponseNum)+"_JP"
-            dpg.configure_item(tabJpAnsLabel, show=True)
+            tabJpResponseLabel = "#_"+str(self.sequenceResponseNum)+"_JP"
+            dpg.configure_item(tabJpResponseLabel, show=True)
 
             responseJPLabel = "response"+str(self.sequenceResponseNum)+"_JP"
             dpg.set_value(responseJPLabel, responseJpText)   
@@ -295,7 +296,7 @@ class AIChat:
             responseJPCodeLabel = "responseCode"+str(self.sequenceResponseNum)+"_JP" 
             dpg.set_value(responseJPCodeLabel, dpg.get_value(responseLabel))    
 
-            dpg.set_value("TabAnsBars", tabJpAnsLabel)
+            dpg.set_value("TabAnsBars", tabJpResponseLabel)
 
 def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
@@ -370,8 +371,8 @@ if __name__ == '__main__':
 
         with dpg.tab_bar(label="assistantTabBars", tag="TabAnsBars") :
             for i in range(SEQUENCENUMMAX + 1) :
-                tabAnsLabel = "#_"+str(i)
-                tabJpAnsLabel = "#_"+str(i)+"_JP"
+                tabResponseLabel = "#_"+str(i)
+                tabJpResponseLabel = "#_"+str(i)+"_JP"
 
                 responseLabel = "response"+str(i)
                 responseJpLabel = "response"+str(i)+"_JP"   
@@ -381,12 +382,12 @@ if __name__ == '__main__':
                 copyCodeAllLabel = "copyCodeAllLabel"+str(i)
 
                 isShowTaba = chatai.getSequenceNum() > i
-                with dpg.tab(label=tabAnsLabel, tag=tabAnsLabel, show=isShowTaba):
+                with dpg.tab(label=tabResponseLabel, tag=tabResponseLabel, show=isShowTaba):
                     dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = i)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
 
-                with dpg.tab(label=tabJpAnsLabel, tag=tabJpAnsLabel, show=isShowTaba):
+                with dpg.tab(label=tabJpResponseLabel, tag=tabJpResponseLabel, show=isShowTaba):
                     dpg.add_input_text(tag=responseJpLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = i)
                     dpg.add_input_text(tag=responseJpCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True)
