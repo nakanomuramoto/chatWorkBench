@@ -1,4 +1,8 @@
 import sys
+
+import requests
+import json
+
 import openai
 
 import re
@@ -17,6 +21,28 @@ POSX6, POSY6 = 10, 100 + HEIGHT2 + 30
 
 SEQUENCENUMMAX = 9
 
+class AITranslate:
+    def __init__(self, key):
+        self.keyDeepL = key
+
+    def translate(self, text, target_lang):
+        url = "https://api-free.deepl.com/v2/translate"
+        params = {
+            "auth_key": self.keyDeepL,
+            "text": text,
+            "target_lang": target_lang
+        }
+        response = requests.post(url, data=params)
+        if response.status_code == 200:
+            result = json.loads(response.content.decode('utf-8'))
+            translations = result.get('translations', [])
+            if len(translations) > 0:
+                return translations[0].get('text', '')
+
+        print(self.keyDeepL)
+
+        return ''
+
 class AIChat:
 
     # messages=[
@@ -24,7 +50,7 @@ class AIChat:
     #     {"role": "user", "content": user_input},
     #     {"role": "assistant", "content": a}]
 
-    def __init__(self, key):
+    def __init__(self, key, deepL):
         openai.api_key = key
 
         self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
@@ -190,15 +216,22 @@ class AIChat:
     def getSequenceNum(self):
         return self.sequenceNum
 
-    def activateTranslation(self, sender, app_data):
+    def translateInput(self, sender, app_data):
         inputLabel = "input"+str(self.sequenceNum)
         inputText=dpg.get_value(inputLabel)
 
         if(inputText == ""):
             return
         else:  
+            print("deepL input", inputText)
+            inputEnText = deepL.translate(inputText, "EN")
+            print("deepL output", inputEnText)
+
             tabEnLabel = "#"+str(self.sequenceNum)+"_EN"
             dpg.configure_item(tabEnLabel, show=True)
+
+            inputEnLabel = "input"+str(self.sequenceNum)+"_EN"
+            dpg.set_value(inputEnLabel, inputEnText)   
 
             inputCodeLabel = "inputCode"+str(self.sequenceNum) 
             inputEnCodeLabel = "inputCode"+str(self.sequenceNum)+"_EN" 
@@ -221,6 +254,7 @@ def copyCodeAll(sender, app_data, user_data):
 def exit(_sender, _data):
     dpg.stop_dearpygui()
 
+
 def main():
     print('>> AIChat: see you ')
 
@@ -230,7 +264,11 @@ if __name__ == '__main__':
     with open('key.txt', 'r') as f:
         key = f.read().strip()
 
-    chatai = AIChat(key)
+    with open('keyDeepL.txt', 'r') as f:
+        keyDeepL = f.read().strip()
+
+    deepL = AITranslate(keyDeepL)
+    chatai = AIChat(key, deepL)
 
     dpg.create_context()
 
@@ -287,7 +325,7 @@ if __name__ == '__main__':
         with dpg.group(horizontal=True):
             dpg.add_button(label="Ask openAI", callback=chatai.SendMessageToOpenAI)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False, color=(10,220,10)) 
-            dpg.add_button(tag="jptoEnTranslation", label="Translation to EN", indent=150, callback=chatai.activateTranslation)
+            dpg.add_button(tag="jptoEnTranslation", label="Translation to EN", indent=150, callback=chatai.translateInput)
             dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)            
       
         with dpg.tab_bar(label="TabBars", tag="TabBars") :
