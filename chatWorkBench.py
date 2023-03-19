@@ -50,7 +50,7 @@ class AIChat:
     #     {"role": "user", "content": user_input},
     #     {"role": "assistant", "content": a}]
 
-    def __init__(self, key, deepL):
+    def __init__(self, key, deepL) : # ):
         openai.api_key = key
 
         self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
@@ -77,6 +77,10 @@ class AIChat:
         dpg.set_value(inputLabel, "")
         dpg.configure_item(inputLabel, enabled=True)
 
+        inputEnLabel = "input0_EN"
+        dpg.set_value(inputEnLabel, "")
+        dpg.configure_item(inputEnLabel, enabled=True)
+
         responseLabel = "response0"
         dpg.set_value(responseLabel, "")
         dpg.configure_item(responseLabel, enabled=False)
@@ -84,7 +88,9 @@ class AIChat:
         self.sequenceNum = 0
         for i in range(SEQUENCENUMMAX + 1) :
             tabLabel = "#"+str(i)
+            tabEnLabel = "#"+str(i)+"_EN"
             inputLabel = "input"+str(i)
+            inputEnLabel = "input"+str(i)+"_EN"
             inputCodeLabel = "inputCode"+str(i)             
             responseLabel = "response"+str(i)
 
@@ -92,10 +98,13 @@ class AIChat:
             responseCodeLabel = "responseCode"+str(i)
 
             dpg.configure_item(tabLabel, show=(1 > i))
+            dpg.configure_item(tabEnLabel, show=(0 > i))
             dpg.configure_item(tabAnsLabel, show=(0 > i))
 
             dpg.set_value(inputLabel, "")
             dpg.configure_item(inputLabel, enabled=True)
+            dpg.set_value(inputEnLabel, "")
+            dpg.configure_item(inputEnLabel, enabled=True)
 
             dpg.set_value(inputCodeLabel, "")
             dpg.set_value(responseLabel, "")
@@ -131,14 +140,14 @@ class AIChat:
         if(inputText == ""):
             return
         else:    
-            inputLabel = "input"+str(self.sequenceNum)
+            inputEnLabel = "input"+str(self.sequenceNum)+"_EN"
+
+            if dpg.get_value(inputEnLabel) != "":
+                inputText = dpg.get_value(inputEnLabel)
+
             inputCodeLabel = "inputCode"+str(self.sequenceNum) 
 
-            responseLabel = "response"+str(self.sequenceNum)
-            responseCodeLabel = "responseCode"+str(self.sequenceNum)
-
-            dpg.configure_item(responseLabel, show=True)
-            inputText=dpg.get_value(inputLabel)
+            # inputText=dpg.get_value(inputLabel)
             inputCode=dpg.get_value(inputCodeLabel)
             inputText += inputCode
             print("userInput: ", inputText)
@@ -151,6 +160,10 @@ class AIChat:
             self.assistantContents.append(a)
 
             responseMassage = unicode_escape_sequence_to_japanese(a)
+
+            responseLabel = "response"+str(self.sequenceNum)
+            responseCodeLabel = "responseCode"+str(self.sequenceNum)
+            dpg.configure_item(responseLabel, show=True)
 
             if self.sequenceNum < SEQUENCENUMMAX : 
                 self.messageList.append({"role": "assistant", "content": a})
@@ -193,6 +206,8 @@ class AIChat:
 
             dpg.configure_item(inputLabel, enabled=False)
             dpg.configure_item(responseLabel, enabled=False)
+            if dpg.get_value(inputEnLabel) != "":
+                dpg.configure_item(inputEnLabel, enabled=False)
 
             tabLabel = "#"+str(self.sequenceNum)    
             dpg.set_value("TabBars", tabLabel)
@@ -224,7 +239,9 @@ class AIChat:
             return
         else:  
             print("deepL input", inputText)
+            dpg.configure_item("nowTranlating", show=True)
             inputEnText = deepL.translate(inputText, "EN")
+            dpg.configure_item("nowTranlating", show=False)  
             print("deepL output", inputEnText)
 
             tabEnLabel = "#"+str(self.sequenceNum)+"_EN"
@@ -268,7 +285,7 @@ if __name__ == '__main__':
         keyDeepL = f.read().strip()
 
     deepL = AITranslate(keyDeepL)
-    chatai = AIChat(key, deepL)
+    chatai = AIChat(key, deepL)  # )
 
     dpg.create_context()
 
@@ -326,7 +343,8 @@ if __name__ == '__main__':
             dpg.add_button(label="Ask openAI", callback=chatai.SendMessageToOpenAI)
             dpg.add_loading_indicator(tag="nowLoading", style=1, radius=1.5, thickness=1.5, show=False, color=(10,220,10)) 
             dpg.add_button(tag="jptoEnTranslation", label="Translation to EN", indent=150, callback=chatai.translateInput)
-            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)            
+            dpg.add_loading_indicator(tag="nowTranlating", style=1, radius=1.5, thickness=1.5, show=False, color=(10,120,180))         
+            dpg.add_text(tag="totalToken", default_value="total Tokens = " + str(chatai.getTotalTokens()), indent=500)
       
         with dpg.tab_bar(label="TabBars", tag="TabBars") :
             for i in range(SEQUENCENUMMAX + 1) :
