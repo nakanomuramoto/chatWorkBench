@@ -298,6 +298,23 @@ class AIChat:
 
             dpg.set_value("TabAnsBars", tabJpResponseLabel)
 
+    def checkRate(self, sender, app_data):
+        url = "https://api.chatterbot.io/v1/token"
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": openai.api_key 
+        }
+
+        response = requests.get(url, headers=headers)
+
+        data = response.json()
+        print(data)
+
+        current_usage_fee = data["data"][0]["attributes"]["cost"]
+
+        print(f"Current usage fee: ${current_usage_fee}")
+
 def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
@@ -340,6 +357,8 @@ if __name__ == '__main__':
             # dpg.add_menu_item(label="SetPath", callback=setPath)
             # dpg.add_menu_item(label="Save", callback=print_me)
             # dpg.add_menu_item(label="Save As", callback=print_me)
+
+            dpg.add_menu_item(label="Check Rate", callback=chatai.checkRate)
 
             with dpg.menu(label="Settings"):
                 # dpg.add_menu_item(label="Setting 1", callback=print_me, check=True)
