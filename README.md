@@ -15,14 +15,14 @@
   
 ### 注意
 
-- API-keyはpushしないこと <p>
- <p>
- 
-addしない方法<p>
+- API-keyはpushしないこと <p> 
+ addしない方法
 
    ```
    git rm -r --ignore-unmatch --cached key.txt
    ```
+   
+
 
 - 作者はいかなる責任も負わない
 
