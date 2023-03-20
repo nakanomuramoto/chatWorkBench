@@ -1,18 +1,15 @@
 import os
 import sys
-
 import requests
 import json
-
-import openai
-
 import re
+import string
 
 import pyperclip
-
+import openai
 import dearpygui.dearpygui as dpg
 
-import string
+
 
 WIDTH, HEIGHT = 1440, 720
 WIDTH1, HEIGHT1 = 700, 640
@@ -113,10 +110,6 @@ def insert_line_breaks(text, line_length=24, count_alphanumeric_as_half=True):
     
     return formatted_text
 
-text = "This is a long text that needs to be split into multiple lines."
-formatted_text = insert_line_breaks(text, line_length=10, count_alphanumeric_as_half=True)
-print(formatted_text)
-
 class AIChat:
 
     # messages=[
@@ -160,10 +153,6 @@ class AIChat:
         dpg.set_value(responseLabel, "")
         dpg.configure_item(responseLabel, enabled=False)
 
-        # responseJpLabel = "response0_JP"
-        # dpg.set_value(responseJpLabel, "")
-        # dpg.configure_item(responseJpLabel, enabled=False)
-
         self.sequenceInputNum = 0
         self.sequenceResponseNum = 0
         for i in range(SEQUENCENUMMAX + 1) :
@@ -187,16 +176,6 @@ class AIChat:
             responseLabel = "response"+str(i)
             dpg.set_value(responseLabel, "")            
 
-            # tabJpResponseLabel = "#_"+str(i)+"_JP"
-            # dpg.configure_item(tabJpResponseLabel, show=(0 > i))
-            # responseJpLabel = "response"+str(i)+"_JP" 
-            # dpg.set_value(responseJpLabel, "")
-
-            # responseCodeLabel = "responseCode"+str(i)
-            # dpg.set_value(responseCodeLabel, "")
-            # responseJpCodeLabel = "responseCode"+str(i)+"_JP"
-            # dpg.set_value(responseJpCodeLabel, "")
-
         self.totalTokens = 0
         dpg.set_value("totalToken", "total Tokens = " + str(self.totalTokens))
 
@@ -214,7 +193,6 @@ class AIChat:
         )
 
         a = response['choices'][0]['message']['content']
-        # print("assistantAnswer:", unicode_escape_sequence_to_japanese(a))
 
         print(response)
 
@@ -234,7 +212,6 @@ class AIChat:
 
             inputCodeLabel = "inputCode"+str(self.sequenceInputNum) 
 
-            # inputText=dpg.get_value(inputLabel)
             inputCode=dpg.get_value(inputCodeLabel)
             inputText += inputCode
             print("userInput: ", inputText)
@@ -298,12 +275,7 @@ class AIChat:
                 dpg.configure_item(inputEnLabel, enabled=False)
 
             tabLabel = "#"+str(self.sequenceInputNum)    
-            dpg.set_value("TabBars", tabLabel)
-            
-            # tabResponseLabel = "#_"+str(self.sequenceInputNum) 
-            # dpg.set_value("TabAnsBars", tabResponseLabel)
-            # tabResponseLabel = "#_"+str(self.sequenceInputNum)                 
-            # dpg.configure_item(tabResponseLabel, show=True)            
+            dpg.set_value("TabBars", tabLabel)  
 
             self.sequenceInputNum += 1
             tabLabel = "#"+str(self.sequenceInputNum)
@@ -357,23 +329,10 @@ class AIChat:
             dpg.configure_item("nowTranlatingJP", show=False)  
             print("deepL output Jp ", repr(responseJpText))
 
-            # tabJpResponseLabel = "#_"+str(self.sequenceResponseNum)+"_JP"
-            # dpg.configure_item(tabJpResponseLabel, show=True)
-
-            # responseJPLabel = "response"+str(self.sequenceResponseNum)+"_JP"
-            # dpg.set_value(responseJPLabel, responseJpText)   
-
-            # responseLabel = "responseCode"+str(self.sequenceResponseNum) 
-            # responseJPCodeLabel = "responseCode"+str(self.sequenceResponseNum)+"_JP" 
-            # dpg.set_value(responseJPCodeLabel, dpg.get_value(responseLabel))    
-
             responseJpText = insert_line_breaks(responseJpText, line_length=50, count_alphanumeric_as_half=True)
 
             dpg.configure_item("window3", show=True)  
             dpg.set_value("translatedJP", responseJpText)  
-
-            # dpg.set_value("TabAnsBars", tabJpResponseLabel)
-
 
 def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
@@ -442,19 +401,15 @@ if __name__ == '__main__':
 
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
         with dpg.group(horizontal=True):
-            dpg.add_text(default_value="response from chatGPT " )
-            dpg.add_button(tag="entoJpTranslation", label="Translation clipboard to JP", indent=250, callback=chatai.translateOutput, show=validTranslate)
+            # dpg.add_text(default_value="response from chatGPT " )
+            dpg.add_button(tag="entoJaTranslation", label="Translation clipboard to JA", callback=chatai.translateOutput, show=validTranslate)
             dpg.add_loading_indicator(tag="nowTranlatingJP", style=1, radius=1.5, thickness=1.5, show=False, color=(10,120,180))  
 
         with dpg.tab_bar(label="assistantTabBars", tag="TabAnsBars") :
             for i in range(SEQUENCENUMMAX + 1) :
                 tabResponseLabel = "#_"+str(i)
-                # tabJpResponseLabel = "#_"+str(i)+"_JP"
-
                 responseLabel = "response"+str(i)
-                # responseJpLabel = "response"+str(i)+"_JP"   
                 responseCodeLabel = "responseCode"+str(i)
-                # responseJpCodeLabel = "responseCode"+str(i)+"_JP"
 
                 copyCodeAllLabel = "copyCodeAllLabel"+str(i)
 
@@ -463,11 +418,6 @@ if __name__ == '__main__':
                     dpg.add_input_text(tag=responseLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = i)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
-
-                # with dpg.tab(label=tabJpResponseLabel, tag=tabJpResponseLabel, show=isShowTaba):
-                #     dpg.add_input_text(tag=responseJpLabel, width=WIDTH, height=HEIGHT2, pos=(POSX5, POSY5), default_value="", multiline=True, enabled=False , tracked=True)
-                #     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = i)
-                #     dpg.add_input_text(tag=responseJpCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True)
 
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), horizontal_scrollbar=True):
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
