@@ -129,7 +129,7 @@ class AIChat:
         self.assistantContents = []
         self.assistantCode = []
 
-        self.messageList = [{"role": "system", "content": self.systemContent}]
+        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
         self.totalTokens = 0
         self.sequenceInputNum = 0
         self.sequenceResponseNum = 0
@@ -142,7 +142,7 @@ class AIChat:
         self.assistantContents = []
         self.assistantCode = []
 
-        self.messageList = [{"role": "system", "content": self.systemContent}]
+        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
         
         inputLabel = "input0"
         dpg.set_value(inputLabel, "")
@@ -193,14 +193,16 @@ class AIChat:
         dpg.set_value("totalToken", "total Tokens = " + str(self.totalTokens))
 
     def changeSystem(self):
-        self.systemContent = ""
-        newSystemContent = dpg.get_value("newSystemContent")
-        print(newSystemContent)
-        if SYSTEMCONTENTSCOMBO.index(newSystemContent) < SYSTEMCONTENTSCOMBO[0] :
-            self.systemContent = "You are the best " + newSystemContent + " programmer in the world. "
-            self.systemContent += "the " + newSystemContent + " scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."
+        nextSystemContent = ''
+        selectedContent = dpg.get_value("newSystemContent")
+        self.systemContent = []
+        print(selectedContent)
+        if SYSTEMCONTENTSCOMBO.index(selectedContent) < SYSTEMCONTENTSCOMBO[0] :
+            nextSystemContent = "You are the best " + selectedContent + " programmer in the world. "
+            nextSystemContent += "the " + selectedContent + " scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."
         else :
-            self.systemContent = "You are the best " + newSystemContent + " in the world. "
+            nextSystemContent = "You are the best " + selectedContent + " in the world. "
+        self.systemContent.append(nextSystemContent)
         print(self.systemContent)
         self.resetChat()     
         dpg.configure_item("window4", show=False)  
