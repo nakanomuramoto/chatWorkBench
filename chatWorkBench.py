@@ -14,6 +14,7 @@ import easygui as eg
 WIDTH, HEIGHT = 1440, 720
 WIDTH1, HEIGHT1 = 700, 640
 WIDTH2, HEIGHT2 = WIDTH1, 240
+WIDTH3, HEIGHT3 = 320, 240
 
 POSX1, POSY1 = 10, 30
 POSX3, POSY3 = 10 + WIDTH1 + 10, 30
@@ -24,6 +25,8 @@ POSX5, POSY5 = 10, 100
 POSX6, POSY6 = 10, 100 + HEIGHT2 + 30
 
 SEQUENCENUMMAX = 9
+
+SYSTEMCONTENTSCOMBO = (4, "python", "c++", "shell script", "producer", "director", "adviser")
 
 class AITranslate:
     def __init__(self, key):
@@ -126,20 +129,20 @@ class AIChat:
         self.assistantContents = []
         self.assistantCode = []
 
-        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
+        self.messageList = [{"role": "system", "content": self.systemContent}]
         self.totalTokens = 0
         self.sequenceInputNum = 0
         self.sequenceResponseNum = 0
 
     def resetChat(self):
         print("log reset")
-        self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
+        # self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
         self.userContents = []
         self.userCode = []        
         self.assistantContents = []
         self.assistantCode = []
 
-        self.messageList = [{"role": "system", "content": self.systemContent[0]}]
+        self.messageList = [{"role": "system", "content": self.systemContent}]
         
         inputLabel = "input0"
         dpg.set_value(inputLabel, "")
@@ -152,6 +155,10 @@ class AIChat:
         responseLabel = "response0"
         dpg.set_value(responseLabel, "")
         dpg.configure_item(responseLabel, enabled=False)
+
+        responseCodeLabel = "responseCode0" 
+        dpg.set_value(responseCodeLabel, "")
+        dpg.configure_item(responseCodeLabel, enabled=False)
 
         self.sequenceInputNum = 0
         self.sequenceResponseNum = 0
@@ -174,11 +181,29 @@ class AIChat:
             tabResponseLabel = "#_"+str(i)
             dpg.configure_item(tabResponseLabel, show=(0 > i))
             responseLabel = "response"+str(i)
-            dpg.set_value(responseLabel, "")            
+            dpg.set_value(responseLabel, "")
+
+            responseLabel = "response"+str(i)
+            dpg.set_value(responseLabel, "")  
+
+            responseCodeLabel = "responseCode"+str(i)
+            dpg.set_value(responseCodeLabel, "")           
 
         self.totalTokens = 0
         dpg.set_value("totalToken", "total Tokens = " + str(self.totalTokens))
 
+    def changeSystem(self):
+        self.systemContent = ""
+        newSystemContent = dpg.get_value("newSystemContent")
+        print(newSystemContent)
+        if SYSTEMCONTENTSCOMBO.index(newSystemContent) < SYSTEMCONTENTSCOMBO[0] :
+            self.systemContent = "You are the best " + newSystemContent + " programmer in the world. "
+            self.systemContent += "the " + newSystemContent + " scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."
+        else :
+            self.systemContent = "You are the best " + newSystemContent + " in the world. "
+        print(self.systemContent)
+        self.resetChat()     
+        dpg.configure_item("window4", show=False)  
 
     def response(self, user_input):
         self.messageList.append({"role": "user", "content": user_input})
@@ -355,6 +380,11 @@ def copyCodeAll(sender, app_data, user_data):
 def exit(_sender, _data):
     dpg.stop_dearpygui()
 
+def openChangeSystemWindow(sender, data):
+    dpg.configure_item("window4", show=True)  
+
+def closeChangeSystemWindow(_sender, _data):
+    dpg.configure_item("window4", show=False)  
 
 def main():
     print('>> AIChat: see you ')
@@ -387,10 +417,10 @@ if __name__ == '__main__':
             # dpg.add_menu_item(label="Save As", callback=print_me)
 
             with dpg.menu(label="Settings"):
-                # dpg.add_menu_item(label="Setting 1", callback=print_me, check=True)
+                dpg.add_menu_item(label="System Content", callback=openChangeSystemWindow)
                 # dpg.add_menu_item(label="Setting 2", callback=print_me)
                 
-                dpg.add_combo(("Python", ""), label="<fake", default_value="Python")
+                # dpg.add_combo(("Python", ""), label="<fake", default_value="Python")
                 dpg.add_slider_float(label="temperature", show=False)
 
             dpg.add_menu_item(label="Reset", callback=chatai.resetChat)
@@ -408,7 +438,7 @@ if __name__ == '__main__':
 
     dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), no_bring_to_front_on_focus=True, horizontal_scrollbar=True):
         with dpg.group(horizontal=True):
             # dpg.add_text(default_value="response from chatGPT " )
             dpg.add_button(tag="entoJaTranslation", label="Translation clipboard to JA", callback=chatai.translateOutput, show=validTranslate)
@@ -428,7 +458,7 @@ if __name__ == '__main__':
                     dpg.add_button(label="copy Code below", pos=(POSX5, POSY6-30+2) , callback=copyCodeAll, user_data = i)
                     dpg.add_input_text(tag=responseCodeLabel, width=WIDTH, height=HEIGHT2, pos=(POSX6, POSY6), default_value="", multiline=True, tracked=True) 
 
-    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), horizontal_scrollbar=True):
+    with dpg.window(width=WIDTH1, height=HEIGHT1, label="User", tag="window1", pos=(POSX1, POSY1), no_bring_to_front_on_focus=True, horizontal_scrollbar=True):
         # https://pythonprogramming.altervista.org/input-text-examples-in-dearpygui/
 
         with dpg.group(horizontal=True):
@@ -461,6 +491,13 @@ if __name__ == '__main__':
 
     with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant JP", tag="window3", pos=(POSX4, POSY4), horizontal_scrollbar=True, show=False):
         dpg.add_input_text(tag="translatedJP", width=-10, height=-10, pos=(POSX1, POSY1), default_value="", multiline=True, enabled=False , tracked=True)
+
+    with dpg.window(width=WIDTH3, height=HEIGHT3, label="Assistant JP", tag="window4", pos=(POSX1, POSY1), show=False):
+        dpg.add_text("Change system content")   
+        dpg.add_combo(SYSTEMCONTENTSCOMBO[1:], tag="newSystemContent", default_value="python") 
+        with dpg.group(horizontal=True):
+            dpg.add_button(tag="changeSystem", label="change and reset", callback=chatai.changeSystem)
+            dpg.add_button(tag="cancelChangeSystem", label="cancel", callback=closeChangeSystemWindow)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
