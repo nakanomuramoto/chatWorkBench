@@ -4,12 +4,12 @@ import requests
 import json
 import re
 import string
+import datetime
 
 import pyperclip
 import openai
 import dearpygui.dearpygui as dpg
-
-
+import easygui as eg
 
 WIDTH, HEIGHT = 1440, 720
 WIDTH1, HEIGHT1 = 700, 640
@@ -334,6 +334,15 @@ class AIChat:
             dpg.configure_item("window3", show=True)  
             dpg.set_value("translatedJP", responseJpText)  
 
+    def saveChat(self):
+        now = datetime.datetime.now()
+        now = now.strftime("%y%m%d_%H%M%S")
+        filename = eg.filesavebox("Select a output file", 'title', now+'.txt')
+        messages = self.messageList
+        with open(filename, 'w') as f:
+            for message0 in messages:
+                f.write(str(message0) + ", \n")
+
 def unicode_escape_sequence_to_japanese(text):
     pattern = re.compile(r'\\\\u([0-9a-fA-F]{4})')
     return pattern.sub(lambda x: chr(int(x.group(1), 16)), text)
@@ -374,14 +383,14 @@ if __name__ == '__main__':
         with dpg.menu(label="File"):
             # dpg.add_menu_item(label="Open", callback=openImage)
             # dpg.add_menu_item(label="SetPath", callback=setPath)
-            # dpg.add_menu_item(label="Save", callback=print_me)
+            dpg.add_menu_item(label="Save", callback=chatai.saveChat)
             # dpg.add_menu_item(label="Save As", callback=print_me)
 
             with dpg.menu(label="Settings"):
                 # dpg.add_menu_item(label="Setting 1", callback=print_me, check=True)
                 # dpg.add_menu_item(label="Setting 2", callback=print_me)
                 
-                dpg.add_combo(("Python", ""), label="Combo", default_value="Python")
+                dpg.add_combo(("Python", ""), label="<fake", default_value="Python")
                 dpg.add_slider_float(label="temperature", show=False)
 
             dpg.add_menu_item(label="Reset", callback=chatai.resetChat)
