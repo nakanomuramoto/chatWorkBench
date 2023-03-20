@@ -1,7 +1,10 @@
- ### 概要
-このスクリプトはOpenAIのGPT-3.5-turboモデルを使用したAIチャットでPythonのスクリプト作成を支援するためのGUIアプリケーションです。<p>
-会話の履歴を表示や継続性を保つ機能があります。<p>
-返信にPythonのスクリプトが含まれる場合、そのスクリプトを抽出して表示する機能もあります。<p>
+## ver0.2 
+
+### 概要
+OpenAIのGPT-3.5-turboを使用したPythonスクリプト作成支援のGUIアプリケーションです。<p>
+会話の履歴や継続性を保つ機能、返信に含まれるPythonスクリプトを抽出・表示する機能もあります。<p>
+deepLの翻訳機能を追加しました。<p>
+<p>
 
 ### 使い方
 % python chatWorkBench.py  <p>
@@ -9,8 +12,9 @@
 
 ### Note: <p>
 
- * dearpyguiが必要です。 <p>
- * API-keyを収めたkey.txtを同じフォルダに置いてください。 <p>
+ * openai, dearpygui, easygui, requests, json, re, string, datetime, pyperclip, os, sysモジュールが必要です。 <p>
+ * openaiのAPI-keyを収めたkey.txtを同じフォルダに置いてください。 <p>
+ * deepLのAPI-keyを収めたkeyDeepL.txtを同じフォルダに置いてください。 <p>
  <p>
   
 ### 注意
@@ -21,15 +25,12 @@
    ```
    git rm -r --ignore-unmatch --cached key.txt
    ```
-   
-
 
 - 作者はいかなる責任も負わない
 
 ### todo
 
-- ログ保存機能
-- 和英翻訳機能
+- システム変更
 
 ### 参考
 https://aiacademy.jp/media/?p=3559
