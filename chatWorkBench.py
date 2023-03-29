@@ -26,6 +26,7 @@ POSX6, POSY6 = 10, 100 + HEIGHT2 + 30
 
 SEQUENCENUMMAX = 9
 
+MODELCOMBO = ("gpt-4", "gpt-3.5-turbo")
 SYSTEMCONTENTSCOMBO = (4, "python", "c++", "shell script", "producer", "director", "adviser")
 
 class AITranslate:
@@ -134,6 +135,8 @@ class AIChat:
         self.sequenceInputNum = 0
         self.sequenceResponseNum = 0
 
+        self.model = "gpt-4"    # "gpt-3.5-turbo"
+
     def resetChat(self):
         print("log reset")
         # self.systemContent = ["You are the best python script programmer in the world. Only the Python scripts in your response should be displayed between ~~~~~~.  Show me the explanation afterwards."]
@@ -207,14 +210,22 @@ class AIChat:
         self.resetChat()     
         dpg.configure_item("window4", show=False)  
 
+    def changeModel(self):
+        selectedContent = dpg.get_value("newModel")
+        print(selectedContent)
+        self.model = selectedContent
+        self.resetChat()     
+        dpg.configure_item("window5", show=False)  
+
     def response(self, user_input):
         self.messageList.append({"role": "user", "content": user_input})
         print(self.messageList)
 
         self.userContents.append(user_input)
 
+        print(self.model)
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", # "gpt-4",
+            model=self.model,
             temperature=0.5,
             messages=self.messageList
         )
@@ -388,6 +399,12 @@ def openChangeSystemWindow(sender, data):
 def closeChangeSystemWindow(_sender, _data):
     dpg.configure_item("window4", show=False)  
 
+def openChangeModelWindow(sender, data):
+    dpg.configure_item("window5", show=True)  
+
+def closeChangeModelWindow(_sender, _data):
+    dpg.configure_item("window5", show=False)  
+
 def main():
     print('>> AIChat: see you ')
 
@@ -420,6 +437,7 @@ if __name__ == '__main__':
 
             with dpg.menu(label="Settings"):
                 dpg.add_menu_item(label="System Content", callback=openChangeSystemWindow)
+                dpg.add_menu_item(label="Model", callback=openChangeModelWindow)
                 # dpg.add_menu_item(label="Setting 2", callback=print_me)
                 
                 # dpg.add_combo(("Python", ""), label="<fake", default_value="Python")
@@ -438,7 +456,7 @@ if __name__ == '__main__':
         with dpg.font(file="./Noto_Sans_JP/NotoSansJP-Bold.otf", size=14) as small_font:
             dpg.add_font_range_hint(dpg.mvFontRangeHint_Japanese)
 
-    dpg.create_viewport(title='openAI, gpt-3.5-turbo', width=WIDTH, height=HEIGHT)
+    dpg.create_viewport(title='openAI, gpt', width=WIDTH, height=HEIGHT)
 
     with dpg.window(width=WIDTH1, height=HEIGHT1, label="Assistant", tag="window2", pos=(POSX3, POSY3), no_bring_to_front_on_focus=True, horizontal_scrollbar=True):
         with dpg.group(horizontal=True):
@@ -494,12 +512,19 @@ if __name__ == '__main__':
     with dpg.window(width=WIDTH2, height=HEIGHT2, label="Assistant JP", tag="window3", pos=(POSX4, POSY4), horizontal_scrollbar=True, show=False):
         dpg.add_input_text(tag="translatedJP", width=-10, height=-10, pos=(POSX1, POSY1), default_value="", multiline=True, enabled=False , tracked=True)
 
-    with dpg.window(width=WIDTH3, height=HEIGHT3, label="Assistant JP", tag="window4", pos=(POSX1, POSY1), show=False):
+    with dpg.window(width=WIDTH3, height=HEIGHT3, label="ChangeSystemLabel", tag="window4", pos=(POSX1, POSY1), show=False):
         dpg.add_text("Change system content")   
         dpg.add_combo(SYSTEMCONTENTSCOMBO[1:], tag="newSystemContent", default_value="python") 
         with dpg.group(horizontal=True):
             dpg.add_button(tag="changeSystem", label="change and reset", callback=chatai.changeSystem)
             dpg.add_button(tag="cancelChangeSystem", label="cancel", callback=closeChangeSystemWindow)
+
+    with dpg.window(width=WIDTH3, height=HEIGHT3, label="ChangeModelLabel", tag="window5", pos=(POSX1, POSY1), show=False):
+        dpg.add_text("Change model")   
+        dpg.add_combo(MODELCOMBO, tag="newModel", default_value=MODELCOMBO[0]) 
+        with dpg.group(horizontal=True):
+            dpg.add_button(tag="changeModel", label="change and reset", callback=chatai.changeModel)
+            dpg.add_button(tag="cancelChangeModel", label="cancel", callback=closeChangeModelWindow)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
